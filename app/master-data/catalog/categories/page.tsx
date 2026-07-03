@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -71,6 +72,7 @@ const mockCategories: Category[] = [
 ]
 
 export default function CategoriesPage() {
+  const router = useRouter()
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [showFilters, setShowFilters] = React.useState(false)
 
@@ -193,7 +195,7 @@ export default function CategoriesPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/catalog/categories/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add Category
             </Button>

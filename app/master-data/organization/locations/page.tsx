@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -57,21 +58,20 @@ import {
 
 export type Location = {
   id: string
-  code: string
   name: string
-  city: string
-  country: string
-  type: string
+  company: string
+  description: string
 }
 
 const mockLocations: Location[] = [
-  { id: "LOC-001", code: "HQ-JKT", name: "Head Office", city: "Jakarta", country: "Indonesia", type: "Office" },
-  { id: "LOC-002", code: "BO-BDG", name: "Bandung Office", city: "Bandung", country: "Indonesia", type: "Office" },
-  { id: "LOC-003", code: "WH-SUB", name: "Surabaya Warehouse", city: "Surabaya", country: "Indonesia", type: "Warehouse" },
-  { id: "LOC-004", code: "DC-JKT", name: "Main Data Center", city: "Jakarta", country: "Indonesia", type: "Data Center" },
+  { id: "LOC-001", name: "Head Office", company: "Acme Inc", description: "Main administrative office block and headquarters based in JKT." },
+  { id: "LOC-002", name: "Bandung Office", company: "Acme Inc", description: "Regional branch office in Bandung for sales operations." },
+  { id: "LOC-003", name: "Surabaya Warehouse", company: "Acme Corp.", description: "Central warehouse for inventory distribution and logistics." },
+  { id: "LOC-004", name: "Main Data Center", company: "Acme Corp.", description: "Secure colocation data center housing corporate servers." },
 ]
 
 export default function LocationsPage() {
+  const router = useRouter()
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [showFilters, setShowFilters] = React.useState(false)
 
@@ -104,42 +104,17 @@ export default function LocationsPage() {
     {
       accessorKey: "name",
       header: "Location Name",
-      cell: ({ row }) => (
-        <div>
-          <span className="font-semibold text-foreground block text-sm">{row.original.name}</span>
-          <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">Code: {row.original.code}</span>
-        </div>
-      )
+      cell: ({ row }) => <span className="font-semibold text-foreground text-sm">{row.original.name}</span>
     },
     {
-      accessorKey: "city",
-      header: "City / Country",
-      cell: ({ row }) => (
-        <div className="text-xs">
-          <span className="text-foreground block">{row.original.city}</span>
-          <span className="text-muted-foreground block mt-0.5">{row.original.country}</span>
-        </div>
-      )
+      accessorKey: "company",
+      header: "Company",
+      cell: ({ row }) => <span className="text-xs text-foreground font-medium">{row.original.company}</span>,
     },
     {
-      accessorKey: "type",
-      header: "Type",
-      cell: ({ row }) => {
-        const type = row.original.type
-        let typeBadge = "bg-muted text-muted-foreground"
-        if (type === "Office") {
-          typeBadge = "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-        } else if (type === "Warehouse") {
-          typeBadge = "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-        } else if (type === "Data Center") {
-          typeBadge = "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-        }
-        return (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${typeBadge}`}>
-            {type}
-          </span>
-        )
-      },
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.description}</span>,
     },
     {
       id: "actions",
@@ -219,7 +194,7 @@ export default function LocationsPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/organization/locations/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add Location
             </Button>

@@ -265,7 +265,12 @@ const data = {
   ],
 }
 
+import { useAuth } from "@/lib/auth-context"
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth()
+  const displayUser = user || data.user
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -279,7 +284,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain label="System" items={data.navSystem} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={displayUser} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

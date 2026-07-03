@@ -44,7 +44,11 @@ const mockGaAssets: GaAsset[] = [
   { id: "GA-A-019", name: "Toyota Voxy B 1503 ROG", tag: "GA-55996", serial: "-", status: "Available", category: "Kendaraan", subcategory: "Mobil", value: 595700000, assignedTo: "Not Assigned" },
 ]
 
+import { useRouter } from "next/navigation"
+
 export default function GeneralAffairsAssetManagementPage() {
+  const router = useRouter()
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -66,7 +70,7 @@ export default function GeneralAffairsAssetManagementPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/ga-assets/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add GA Asset
             </Button>

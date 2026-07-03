@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -62,16 +63,19 @@ export type Product = {
   brand: string
   category: string
   masterCategory: string
+  productType: string
+  description: string
 }
 
 const mockProducts: Product[] = [
-  { id: "PRD-001", code: "PRD-IP3", name: "IdeaPad Slim 3", brand: "Lenovo", category: "Notebook", masterCategory: "Hardware" },
-  { id: "PRD-002", code: "PRD-V34", name: "Vostro 3400", brand: "Dell", category: "Notebook", masterCategory: "Hardware" },
-  { id: "PRD-003", code: "LIC-O365", name: "Office 365 Business Standard", brand: "Microsoft", category: "Software License", masterCategory: "Software" },
-  { id: "PRD-004", code: "PRD-LBP60", name: "LBP 6030w", brand: "HP", category: "Printer", masterCategory: "Hardware" },
+  { id: "PRD-001", code: "PRD-IP3", name: "IdeaPad Slim 3", brand: "Lenovo", category: "Notebook", masterCategory: "Hardware", productType: "Asset", description: "Standard business laptop, Core i5, 16GB RAM." },
+  { id: "PRD-002", code: "PRD-V34", name: "Vostro 3400", brand: "Dell", category: "Notebook", masterCategory: "Hardware", productType: "Asset", description: "Developer workspace laptop, Core i7, 16GB RAM." },
+  { id: "PRD-003", code: "LIC-O365", name: "Office 365 Business Standard", brand: "Microsoft", category: "Software License", masterCategory: "Software", productType: "License", description: "Enterprise user productivity suite subscription." },
+  { id: "PRD-004", code: "PRD-LBP60", name: "LBP 6030w", brand: "HP", category: "Printer", masterCategory: "Hardware", productType: "Asset", description: "Compact wireless laser printing device." },
 ]
 
 export default function ProductsPage() {
+  const router = useRouter()
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [showFilters, setShowFilters] = React.useState(false)
 
@@ -103,17 +107,22 @@ export default function ProductsPage() {
     },
     {
       accessorKey: "name",
-      header: "Product Name",
+      header: "Product Details",
       cell: ({ row }) => (
         <div>
           <span className="font-semibold text-foreground block text-sm">{row.original.name}</span>
-          <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">SKU/Code: {row.original.code}</span>
+          <span className="text-[10px] text-muted-foreground block mt-0.5">{row.original.description}</span>
         </div>
       )
     },
     {
+      accessorKey: "code",
+      header: "SKU / Code",
+      cell: ({ row }) => <span className="text-xs font-mono text-foreground font-medium">{row.original.code}</span>,
+    },
+    {
       accessorKey: "brand",
-      header: "Brand / Manufacturer",
+      header: "Brand",
       cell: ({ row }) => <span className="text-xs text-foreground font-medium">{row.original.brand}</span>,
     },
     {
@@ -122,7 +131,7 @@ export default function ProductsPage() {
       cell: ({ row }) => (
         <div className="text-xs">
           <span className="text-foreground block">{row.original.category}</span>
-          <span className="text-[10px] text-muted-foreground block mt-0.5">Master: {row.original.masterCategory}</span>
+          <span className="text-[10px] text-muted-foreground block mt-0.5">Master: {row.original.masterCategory} ({row.original.productType})</span>
         </div>
       )
     },
@@ -204,7 +213,7 @@ export default function ProductsPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/catalog/products/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add Product
             </Button>

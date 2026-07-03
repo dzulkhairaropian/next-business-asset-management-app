@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -71,6 +72,7 @@ const mockCompanies: Company[] = [
 ]
 
 export default function CompaniesPage() {
+  const router = useRouter()
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [showFilters, setShowFilters] = React.useState(false)
 
@@ -102,7 +104,7 @@ export default function CompaniesPage() {
     },
     {
       accessorKey: "name",
-      header: "Company Name",
+      header: "Company Details",
       cell: ({ row }) => (
         <div>
           <span className="font-semibold text-foreground block text-sm">{row.original.name}</span>
@@ -118,12 +120,12 @@ export default function CompaniesPage() {
           <span className="text-foreground block">{row.original.email}</span>
           <span className="text-muted-foreground block mt-0.5">{row.original.phone}</span>
         </div>
-      )
+      ),
     },
     {
       accessorKey: "address",
-      header: "Address",
-      cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.address}</span>,
+      header: "Office Address",
+      cell: ({ row }) => <span className="text-xs text-muted-foreground block max-w-sm truncate">{row.original.address}</span>,
     },
     {
       id: "actions",
@@ -202,7 +204,7 @@ export default function CompaniesPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/organization/companies/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add Company
             </Button>

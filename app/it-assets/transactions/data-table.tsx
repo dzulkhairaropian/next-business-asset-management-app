@@ -22,7 +22,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { SearchIcon, ChevronLeftIcon, ChevronRightIcon, InboxIcon } from "lucide-react"
+import { SearchIcon, ChevronLeftIcon, ChevronRightIcon, InboxIcon, FilterIcon } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -35,6 +35,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [showFilters, setShowFilters] = React.useState(false)
 
   const table = useReactTable({
     data,
@@ -72,7 +73,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="flex flex-col gap-6">
       {/* Filters */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -82,36 +83,59 @@ export function DataTable<TData, TValue>({
             className="pl-9 h-10 w-full text-sm"
           />
         </div>
-
-        <div className="flex flex-wrap gap-2">
-          <select
-            value={typeValue}
-            onChange={(e) => {
-              const val = e.target.value
-              table.getColumn("type")?.setFilterValue(val === "All Types" ? undefined : val)
-            }}
-            className="h-10 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+            className={`h-10 text-xs font-semibold gap-1.5 ${
+              showFilters
+                ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15"
+                : "bg-background text-foreground"
+            }`}
           >
-            <option value="All Types">All Types</option>
-            <option value="Checkout">Checkout</option>
-            <option value="Checkin">Checkin</option>
-          </select>
-
-          <select
-            value={statusValue}
-            onChange={(e) => {
-              const val = e.target.value
-              table.getColumn("status")?.setFilterValue(val === "All Statuses" ? undefined : val)
-            }}
-            className="h-10 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            <option value="All Statuses">All Statuses</option>
-            <option value="Completed">Completed</option>
-            <option value="Pending">Pending</option>
-            <option value="Overdue">Overdue</option>
-          </select>
+            <FilterIcon className="h-4 w-4" />
+            Filters
+          </Button>
         </div>
       </div>
+
+      {/* Expandable Filter Panel */}
+      {showFilters && (
+        <div className="p-5 rounded-xl border bg-card/50 flex flex-wrap gap-3 animate-in slide-in-from-top-2 duration-200">
+          <div className="flex flex-col gap-1.5 min-w-[150px]">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Type</span>
+            <select
+              value={typeValue}
+              onChange={(e) => {
+                const val = e.target.value
+                table.getColumn("type")?.setFilterValue(val === "All Types" ? undefined : val)
+              }}
+              className="h-9 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+            >
+              <option value="All Types">All Types</option>
+              <option value="Checkout">Checkout</option>
+              <option value="Checkin">Checkin</option>
+            </select>
+          </div>
+          <div className="flex flex-col gap-1.5 min-w-[150px]">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Status</span>
+            <select
+              value={statusValue}
+              onChange={(e) => {
+                const val = e.target.value
+                table.getColumn("status")?.setFilterValue(val === "All Statuses" ? undefined : val)
+              }}
+              className="h-9 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+            >
+              <option value="All Statuses">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Success">Success</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+        </div>
+      )}
 
       {/* Table Element */}
       <div className="rounded-xl border bg-card text-card-foreground shadow-xs overflow-hidden">

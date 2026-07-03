@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -60,17 +61,18 @@ export type Department = {
   code: string
   name: string
   company: string
-  head: string
+  description: string
 }
 
 const mockDepartments: Department[] = [
-  { id: "DEP-001", code: "IT", name: "Information Technology", company: "Acme Inc", head: "Dzul Khair Aropian" },
-  { id: "DEP-002", code: "HR", name: "Human Resources", company: "Acme Inc", head: "Karudin" },
-  { id: "DEP-003", code: "FIN", name: "Finance & Accounting", company: "Acme Corp.", head: "Kharisma Ayu" },
-  { id: "DEP-004", code: "SLS", name: "Sales & Marketing", company: "Acme Corp.", head: "Ibrahim" },
+  { id: "DEP-001", code: "IT", name: "Information Technology", company: "Acme Inc", description: "Handles core digital infrastructure, networks, and technical services." },
+  { id: "DEP-002", code: "HR", name: "Human Resources", company: "Acme Inc", description: "Manages employee relations, talent acquisition, and development." },
+  { id: "DEP-003", code: "FIN", name: "Finance & Accounting", company: "Acme Corp.", description: "Oversees financial planning, records, and accounts payable/receivable." },
+  { id: "DEP-004", code: "SLS", name: "Sales & Marketing", company: "Acme Corp.", description: "Responsible for brand growth, business development, and customer acquisition." },
 ]
 
 export default function DepartmentsPage() {
+  const router = useRouter()
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [showFilters, setShowFilters] = React.useState(false)
 
@@ -116,9 +118,9 @@ export default function DepartmentsPage() {
       cell: ({ row }) => <span className="text-xs text-foreground font-medium">{row.original.company}</span>,
     },
     {
-      accessorKey: "head",
-      header: "Department Head",
-      cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.head}</span>,
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => <span className="text-xs text-muted-foreground block max-w-md truncate">{row.original.description}</span>,
     },
     {
       id: "actions",
@@ -198,7 +200,7 @@ export default function DepartmentsPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/organization/departments/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add Department
             </Button>

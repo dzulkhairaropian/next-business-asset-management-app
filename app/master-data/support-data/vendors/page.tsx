@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -57,18 +58,18 @@ import {
 
 export type Vendor = {
   id: string
-  code: string
   name: string
+  email: string
   contactPerson: string
   phone: string
-  category: string
-  status: string
+  website: string
+  address: string
 }
 
 const mockVendors: Vendor[] = [
-  { id: "VND-001", code: "VND-BHN", name: "Bhinneka.com", contactPerson: "Budi Handoko", phone: "+62-21-3006-1234", category: "IT Hardware & Software", status: "Preferred" },
-  { id: "VND-002", code: "VND-GUS", name: "Garda Utama Security", contactPerson: "Susilo Prabowo", phone: "+62-21-5001-5678", category: "Security Facilities", status: "Active" },
-  { id: "VND-003", code: "VND-ICS", name: "Indocatering Service", contactPerson: "Dewi Lestari", phone: "+62-21-7002-8910", category: "Food & Beverage", status: "Inactive" },
+  { id: "VND-001", name: "Bhinneka.com", email: "sales@bhinneka.com", contactPerson: "Budi Handoko", phone: "+62-21-3006-1234", website: "bhinneka.com", address: "Jl. Gunung Sahari Raya No.73, Jakarta" },
+  { id: "VND-002", name: "Garda Utama Security", email: "info@gardautama.co.id", contactPerson: "Susilo Prabowo", phone: "+62-21-5001-5678", website: "gardautama.co.id", address: "Kawasan Industri MM2100, Bekasi" },
+  { id: "VND-003", name: "Indocatering Service", email: "catering@indocatering.com", contactPerson: "Dewi Lestari", phone: "+62-21-7002-8910", website: "indocatering.com", address: "Jl. Margonda Raya No.12, Depok" },
 ]
 
 export default function VendorsPage() {
@@ -103,48 +104,33 @@ export default function VendorsPage() {
     },
     {
       accessorKey: "name",
-      header: "Vendor Name",
+      header: "Vendor Details",
       cell: ({ row }) => (
         <div>
           <span className="font-semibold text-foreground block text-sm">{row.original.name}</span>
-          <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">Code: {row.original.code}</span>
+          <span className="text-[10px] text-muted-foreground mt-0.5 block">Web: {row.original.website}</span>
         </div>
       )
     },
     {
-      accessorKey: "category",
-      header: "Business Category",
-      cell: ({ row }) => <span className="text-xs text-foreground font-medium">{row.original.category}</span>,
-    },
-    {
       accessorKey: "contactPerson",
       header: "Contact Person",
+      cell: ({ row }) => <span className="text-xs text-foreground font-medium">{row.original.contactPerson}</span>,
+    },
+    {
+      accessorKey: "email",
+      header: "Contact Info",
       cell: ({ row }) => (
         <div className="text-xs">
-          <span className="text-foreground block">{row.original.contactPerson}</span>
+          <span className="text-foreground block">{row.original.email}</span>
           <span className="text-muted-foreground block mt-0.5">{row.original.phone}</span>
         </div>
       ),
     },
     {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.original.status
-        let badgeStyle = "bg-muted text-muted-foreground"
-        if (status === "Preferred") {
-          badgeStyle = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-        } else if (status === "Active") {
-          badgeStyle = "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-        } else if (status === "Inactive") {
-          badgeStyle = "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-        }
-        return (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${badgeStyle}`}>
-            {status}
-          </span>
-        )
-      },
+      accessorKey: "address",
+      header: "Address",
+      cell: ({ row }) => <span className="text-xs text-muted-foreground block max-w-sm truncate">{row.original.address}</span>,
     },
     {
       id: "actions",
@@ -180,6 +166,7 @@ export default function VendorsPage() {
     },
   ]
 
+  const router = useRouter()
   const table = useReactTable({
     data: mockVendors,
     columns,
@@ -193,9 +180,10 @@ export default function VendorsPage() {
     globalFilterFn: (row, columnId, filterValue) => {
       const search = filterValue.toLowerCase()
       const name = row.original.name.toLowerCase()
-      const code = row.original.code.toLowerCase()
-      const category = row.original.category.toLowerCase()
-      return name.includes(search) || code.includes(search) || category.includes(search)
+      const website = row.original.website.toLowerCase()
+      const contactPerson = row.original.contactPerson.toLowerCase()
+      const email = row.original.email.toLowerCase()
+      return name.includes(search) || website.includes(search) || contactPerson.includes(search) || email.includes(search)
     },
   })
 
@@ -224,7 +212,7 @@ export default function VendorsPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/support-data/vendors/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add Vendor
             </Button>
@@ -268,21 +256,21 @@ export default function VendorsPage() {
           {showFilters && (
             <div className="p-5 rounded-xl border bg-card/50 flex flex-wrap gap-3 animate-in slide-in-from-top-2 duration-200">
               <div className="flex flex-col gap-1.5 min-w-[150px]">
-                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Business Category</span>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">City</span>
                 <select className="h-9 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer">
-                  <option value="">All Categories</option>
-                  <option value="it">IT Hardware & Software</option>
-                  <option value="security">Security Facilities</option>
-                  <option value="catering">Food & Beverage</option>
+                  <option value="">All Cities</option>
+                  <option value="jkt">Jakarta</option>
+                  <option value="bks">Bekasi</option>
+                  <option value="dpk">Depok</option>
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 min-w-[150px]">
-                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Vendor Status</span>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Contact Person</span>
                 <select className="h-9 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer">
-                  <option value="">All Statuses</option>
-                  <option value="preferred">Preferred</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="">All Contact Persons</option>
+                  <option value="budi">Budi Handoko</option>
+                  <option value="susilo">Susilo Prabowo</option>
+                  <option value="dewi">Dewi Lestari</option>
                 </select>
               </div>
             </div>

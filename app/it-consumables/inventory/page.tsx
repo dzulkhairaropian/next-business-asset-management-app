@@ -28,7 +28,11 @@ const mockConsumables: Consumable[] = [
   { id: "CNS-003", name: "Toner LBP 6030w", model: "-", category: "Toner Laserjet", brand: "HP", qty: 8, minQty: 2, status: "In Stock", cost: 80000 },
 ]
 
+import { useRouter } from "next/navigation"
+
 export default function ITConsumablesInventoryPage() {
+  const router = useRouter()
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -54,7 +58,7 @@ export default function ITConsumablesInventoryPage() {
               <DownloadIcon className="h-3.5 w-3.5" />
               Export Stock
             </Button>
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/it-consumables/inventory/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add IT Consumable
             </Button>

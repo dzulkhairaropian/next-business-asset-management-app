@@ -33,7 +33,11 @@ const mockGaConsumables: Consumable[] = [
   { id: "GAC-008", name: "Buku Kwitansi Sedang", model: "Receipt Book Medium", category: "Alat Tulis", brand: "Paperline", qty: 15, minQty: 5, status: "In Stock", cost: 7500 },
 ]
 
+import { useRouter } from "next/navigation"
+
 export default function GAConsumablesInventoryPage() {
+  const router = useRouter()
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -59,7 +63,7 @@ export default function GAConsumablesInventoryPage() {
               <DownloadIcon className="h-3.5 w-3.5" />
               Export Stock
             </Button>
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/ga-consumables/inventory/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add GA Consumable
             </Button>

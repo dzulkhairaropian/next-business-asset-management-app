@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -58,19 +59,19 @@ import {
 export type OperatingSystem = {
   id: string
   name: string
-  architecture: string
-  publisher: string
-  standardSuite: string
+  brand: string
+  description: string
 }
 
 const mockOperatingSystems: OperatingSystem[] = [
-  { id: "OS-001", name: "Windows 11 Pro", architecture: "x64", publisher: "Microsoft", standardSuite: "Office Preloaded" },
-  { id: "OS-002", name: "Windows 10 Pro", architecture: "x64", publisher: "Microsoft", standardSuite: "LTS Support" },
-  { id: "OS-003", name: "macOS Sequoia", architecture: "ARM64 (Apple Silicon)", publisher: "Apple", standardSuite: "Xcode Developer Tools" },
-  { id: "OS-004", name: "Ubuntu 24.04 LTS", architecture: "x64 / ARM64", publisher: "Canonical", standardSuite: "OpenSSH Server" },
+  { id: "OS-001", name: "Windows 11 Pro", brand: "Microsoft", description: "Standard corporate operating system with security and management software." },
+  { id: "OS-002", name: "Windows 10 Pro", brand: "Microsoft", description: "Older corporate standard operating system, supported for legacy systems." },
+  { id: "OS-003", name: "macOS Sequoia", brand: "Apple", description: "Operating system standard for Apple computers and developers." },
+  { id: "OS-004", name: "Ubuntu 24.04 LTS", brand: "Canonical", description: "Long-term support Linux distribution for servers and workstations." },
 ]
 
 export default function OperatingSystemsPage() {
+  const router = useRouter()
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [showFilters, setShowFilters] = React.useState(false)
 
@@ -102,23 +103,18 @@ export default function OperatingSystemsPage() {
     },
     {
       accessorKey: "name",
-      header: "OS Name",
-      cell: ({ row }) => (
-        <div>
-          <span className="font-semibold text-foreground block text-sm">{row.original.name}</span>
-          <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">Publisher: {row.original.publisher}</span>
-        </div>
-      )
+      header: "OS Platform Name",
+      cell: ({ row }) => <span className="font-semibold text-foreground text-sm">{row.original.name}</span>
     },
     {
-      accessorKey: "architecture",
-      header: "Architecture",
-      cell: ({ row }) => <span className="text-xs font-mono text-foreground font-medium">{row.original.architecture}</span>,
+      accessorKey: "brand",
+      header: "Brand / Publisher",
+      cell: ({ row }) => <span className="text-xs text-foreground font-medium">{row.original.brand}</span>,
     },
     {
-      accessorKey: "standardSuite",
-      header: "Standard Suite",
-      cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.standardSuite}</span>,
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.description}</span>,
     },
     {
       id: "actions",
@@ -197,7 +193,7 @@ export default function OperatingSystemsPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/catalog/operating-systems/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add OS
             </Button>

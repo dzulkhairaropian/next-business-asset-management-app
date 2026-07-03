@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -57,21 +58,22 @@ import {
 
 export type Brand = {
   id: string
+  code: string
   name: string
-  origin: string
-  supportContact: string
   website: string
+  description: string
 }
 
 const mockBrands: Brand[] = [
-  { id: "BRD-001", name: "Lenovo", origin: "China", supportContact: "lenovo.support@corp.com", website: "lenovo.com" },
-  { id: "BRD-002", name: "Dell", origin: "USA", supportContact: "dell.support@corp.com", website: "dell.com" },
-  { id: "BRD-003", name: "HP", origin: "USA", supportContact: "hp.support@corp.com", website: "hp.com" },
-  { id: "BRD-004", name: "Microsoft", origin: "USA", supportContact: "ms.support@corp.com", website: "microsoft.com" },
-  { id: "BRD-005", name: "Apple", origin: "USA", supportContact: "apple.support@corp.com", website: "apple.com" },
+  { id: "BRD-001", code: "LNV", name: "Lenovo", website: "lenovo.com", description: "Global provider of personal computers, laptops, and technology products." },
+  { id: "BRD-002", code: "DLL", name: "Dell", website: "dell.com", description: "American technology company developing laptops, servers, and monitors." },
+  { id: "BRD-003", code: "HPQ", name: "HP", website: "hp.com", description: "Manufacturer of business PCs, printers, and imaging accessories." },
+  { id: "BRD-004", code: "MSFT", name: "Microsoft", website: "microsoft.com", description: "Developer of Operating Systems, cloud services, and software licenses." },
+  { id: "BRD-005", code: "APPL", name: "Apple", website: "apple.com", description: "American hardware manufacturer of macOS, iOS, and premium computers." },
 ]
 
 export default function BrandsPage() {
+  const router = useRouter()
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [showFilters, setShowFilters] = React.useState(false)
 
@@ -112,14 +114,14 @@ export default function BrandsPage() {
       )
     },
     {
-      accessorKey: "origin",
-      header: "Country of Origin",
-      cell: ({ row }) => <span className="text-xs text-foreground font-medium">{row.original.origin}</span>,
+      accessorKey: "code",
+      header: "Brand Code",
+      cell: ({ row }) => <span className="text-xs font-mono text-foreground font-medium">{row.original.code}</span>,
     },
     {
-      accessorKey: "supportContact",
-      header: "Support Contact",
-      cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">{row.original.supportContact}</span>,
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => <span className="text-xs text-muted-foreground block max-w-lg">{row.original.description}</span>,
     },
     {
       id: "actions",
@@ -198,7 +200,7 @@ export default function BrandsPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/catalog/brands/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add Brand
             </Button>

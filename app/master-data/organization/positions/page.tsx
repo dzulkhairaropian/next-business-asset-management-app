@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -59,19 +60,19 @@ export type Position = {
   id: string
   code: string
   name: string
-  division: string
-  level: string
+  description: string
 }
 
 const mockPositions: Position[] = [
-  { id: "POS-001", code: "STF", name: "Staff", division: "Operational", level: "Level 1" },
-  { id: "POS-002", code: "SPV", name: "Supervisor", division: "Management", level: "Level 2" },
-  { id: "POS-003", code: "MGR", name: "Manager", division: "Management", level: "Level 3" },
-  { id: "POS-004", code: "VP", name: "Vice President", division: "Executive", level: "Level 4" },
-  { id: "POS-005", code: "DIR", name: "Director", division: "Executive", level: "Level 5" },
+  { id: "POS-001", code: "STF", name: "Staff", description: "General operational personnel handling daily business tasks." },
+  { id: "POS-002", code: "SPV", name: "Supervisor", description: "Mid-level officer leading small teams and overseeing daily tasks." },
+  { id: "POS-003", code: "MGR", name: "Manager", description: "Department head managing department budgets, assets, and teams." },
+  { id: "POS-004", code: "VP", name: "Vice President", description: "Executive role aligning department goals with general corporate targets." },
+  { id: "POS-005", code: "DIR", name: "Director", description: "C-level executive determining long-term corporate vision and strategy." },
 ]
 
 export default function PositionsPage() {
+  const router = useRouter()
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [showFilters, setShowFilters] = React.useState(false)
 
@@ -112,14 +113,9 @@ export default function PositionsPage() {
       )
     },
     {
-      accessorKey: "division",
-      header: "Division",
-      cell: ({ row }) => <span className="text-xs text-foreground font-medium">{row.original.division}</span>,
-    },
-    {
-      accessorKey: "level",
-      header: "Level",
-      cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">{row.original.level}</span>,
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => <span className="text-xs text-muted-foreground block max-w-lg">{row.original.description}</span>,
     },
     {
       id: "actions",
@@ -199,7 +195,7 @@ export default function PositionsPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => router.push("/master-data/organization/positions/create")}>
               <PlusIcon className="h-3.5 w-3.5" />
               Add Position
             </Button>
