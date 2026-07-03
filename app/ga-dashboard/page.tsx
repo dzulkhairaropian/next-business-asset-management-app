@@ -350,9 +350,15 @@ export default function GeneralAffairsDashboardPage() {
                 <h3 className="font-semibold text-sm text-foreground">Recent Assignments</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">Latest allocations of general facility items.</p>
               </div>
-              <div className="p-8 text-center text-muted-foreground italic flex flex-col items-center justify-center min-h-[160px] gap-2">
-                <span className="text-xs text-muted-foreground">No recent assignments found</span>
-                <Button size="xs" variant="outline" className="mt-1 font-semibold">
+              <div className="p-8 text-center text-muted-foreground flex flex-col items-center justify-center min-h-[180px] gap-3">
+                <div className="h-10 w-10 rounded-xl bg-muted/60 flex items-center justify-center text-muted-foreground border border-dashed border-muted-foreground/30">
+                  <UserCheckIcon className="h-5 w-5 stroke-[1.5]" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-xs font-semibold text-foreground block">No assignments found</span>
+                  <span className="text-[11px] text-muted-foreground block max-w-[200px] mx-auto">No facility items are currently assigned.</span>
+                </div>
+                <Button size="xs" variant="outline" className="mt-1 font-semibold cursor-pointer">
                   Assign GA Asset
                 </Button>
               </div>
@@ -364,9 +370,15 @@ export default function GeneralAffairsDashboardPage() {
                 <h3 className="font-semibold text-sm text-foreground">Recent Maintenance</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">Facility repairs and servicing log.</p>
               </div>
-              <div className="p-8 text-center text-muted-foreground italic flex flex-col items-center justify-center min-h-[160px] gap-2">
-                <span className="text-xs text-muted-foreground">No recent maintenance logs found</span>
-                <Button size="xs" variant="outline" className="mt-1 font-semibold">
+              <div className="p-8 text-center text-muted-foreground flex flex-col items-center justify-center min-h-[180px] gap-3">
+                <div className="h-10 w-10 rounded-xl bg-muted/60 flex items-center justify-center text-muted-foreground border border-dashed border-muted-foreground/30">
+                  <WrenchIcon className="h-5 w-5 stroke-[1.5]" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-xs font-semibold text-foreground block">No maintenance logs</span>
+                  <span className="text-[11px] text-muted-foreground block max-w-[200px] mx-auto">No facility repairs or servicing logged.</span>
+                </div>
+                <Button size="xs" variant="outline" className="mt-1 font-semibold cursor-pointer">
                   Schedule Repair
                 </Button>
               </div>

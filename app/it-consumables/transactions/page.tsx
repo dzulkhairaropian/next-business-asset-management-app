@@ -75,7 +75,7 @@ const mockTransactions: ConsumableTxn[] = [
   { id: "TXN-CNS-050", date: "30 Apr 2026 04:01", product: "Canon BP - 790 (YELLOW)", brand: "Blueprint Indonesia", type: "Checkout", qtyChange: "-4", qtyTransition: "(5 → 1)", totalCost: 0, unitCost: 0, toUser: "Dzul Khair Aropian", byUser: "Dzul Khair Aropian", docs: "-", notes: "adjustment" },
 ]
 
-export default function ConsumablesTransactionsHistoryPage() {
+export default function ITConsumablesTransactionsHistoryPage() {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -94,7 +94,7 @@ export default function ConsumablesTransactionsHistoryPage() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Consumable Transactions History</BreadcrumbPage>
+                  <BreadcrumbPage>IT Consumable Transactions History</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -109,8 +109,8 @@ export default function ConsumablesTransactionsHistoryPage() {
 
         <div className="flex flex-1 flex-col gap-6 p-6">
           <div className="flex flex-col gap-1.5">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Consumable Transactions History</h1>
-            <p className="text-sm text-muted-foreground">Historical records of stock adjustments, issues, and restocks of consumable items.</p>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">IT Consumable Transactions History</h1>
+            <p className="text-sm text-muted-foreground">Historical records of stock adjustments, issues, and restocks of IT consumable items.</p>
           </div>
 
           <DataTable columns={columns} data={mockTransactions} />

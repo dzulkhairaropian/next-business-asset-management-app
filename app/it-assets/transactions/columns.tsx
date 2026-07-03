@@ -1,8 +1,14 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { MoreVerticalIcon, ArrowUpRightIcon, ArrowDownLeftIcon, EyeIcon, PrinterIcon, BanIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { MoreVerticalIcon, ArrowUpRight, ArrowDownLeft } from "lucide-react"
 
 export type Transaction = {
   id: string
@@ -47,12 +53,12 @@ export const columns: ColumnDef<Transaction>[] = [
         <span className="inline-flex items-center gap-1 font-medium text-xs">
           {type === "Checkout" ? (
             <>
-              <ArrowUpRight className="h-3.5 w-3.5 text-blue-500" />
+              <ArrowUpRightIcon className="h-3.5 w-3.5 text-blue-500" />
               <span className="text-blue-600 dark:text-blue-400">Checkout</span>
             </>
           ) : (
             <>
-              <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-500" />
+              <ArrowDownLeftIcon className="h-3.5 w-3.5 text-emerald-500" />
               <span className="text-emerald-600 dark:text-emerald-400">Checkin</span>
             </>
           )}
@@ -133,12 +139,35 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     id: "actions",
-    cell: () => {
+    cell: ({ row }) => {
+      const txn = row.original
       return (
         <div className="text-right">
-          <Button variant="ghost" size="icon" className="h-7 w-7">
-            <MoreVerticalIcon className="h-3.5 w-3.5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <MoreVerticalIcon className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40 text-xs">
+              <DropdownMenuItem onClick={() => alert(`Viewing BAST details for Transaction: ${txn.id}`)}>
+                <EyeIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                View BAST Details
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => alert(`Printing transaction receipt for ${txn.id}`)}>
+                <PrinterIcon className="mr-2 h-3.5 w-3.5" />
+                Print Receipt
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => alert(`Void transaction: ${txn.id}`)}
+                className="text-rose-600 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/20"
+              >
+                <BanIcon className="mr-2 h-3.5 w-3.5" />
+                Void Transaction
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )
     },

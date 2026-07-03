@@ -27,6 +27,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   FilterIcon,
+  InboxIcon,
 } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
@@ -273,8 +274,16 @@ export function DataTable<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  No assets found matching the search or filters.
+                <TableCell colSpan={columns.length} className="h-72 text-center">
+                  <div className="flex flex-col items-center justify-center gap-3 py-10 max-w-[280px] mx-auto">
+                    <div className="h-12 w-12 rounded-2xl bg-muted/60 flex items-center justify-center text-muted-foreground border border-dashed border-muted-foreground/30">
+                      <InboxIcon className="h-6 w-6 stroke-[1.5]" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-semibold text-sm text-foreground">No assets found</h3>
+                      <p className="text-xs text-muted-foreground">We couldn't find any assets matching the search or filters. Try adjusting them.</p>
+                    </div>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

@@ -3,7 +3,14 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { MoreVerticalIcon } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { MoreVerticalIcon, EyeIcon, EditIcon, ArrowUpRightIcon, TrashIcon } from "lucide-react"
 
 export type GaAsset = {
   id: string
@@ -119,12 +126,41 @@ export const columns: ColumnDef<GaAsset>[] = [
   },
   {
     id: "actions",
-    cell: () => (
-      <div className="text-right">
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <MoreVerticalIcon className="h-4 w-4" />
-        </Button>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const asset = row.original
+      return (
+        <div className="text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreVerticalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40 text-xs">
+              <DropdownMenuItem onClick={() => alert(`Viewing details of GA Asset: ${asset.name} (${asset.tag})`)}>
+                <EyeIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => alert(`Editing GA Asset: ${asset.name} (${asset.tag})`)}>
+                <EditIcon className="mr-2 h-3.5 w-3.5" />
+                Edit Asset
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => alert(`Checking out GA Asset: ${asset.name} (${asset.tag})`)}>
+                <ArrowUpRightIcon className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                Checkout / Assign
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => alert(`Deleting GA Asset: ${asset.name} (${asset.tag})`)}
+                className="text-rose-600 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/20"
+              >
+                <TrashIcon className="mr-2 h-3.5 w-3.5" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )
+    },
   },
 ]

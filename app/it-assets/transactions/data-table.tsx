@@ -22,7 +22,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { SearchIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import { SearchIcon, ChevronLeftIcon, ChevronRightIcon, InboxIcon } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -145,8 +145,16 @@ export function DataTable<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  No transactions found.
+                <TableCell colSpan={columns.length} className="h-72 text-center">
+                  <div className="flex flex-col items-center justify-center gap-3 py-10 max-w-[280px] mx-auto">
+                    <div className="h-12 w-12 rounded-2xl bg-muted/60 flex items-center justify-center text-muted-foreground border border-dashed border-muted-foreground/30">
+                      <InboxIcon className="h-6 w-6 stroke-[1.5]" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-semibold text-sm text-foreground">No transactions found</h3>
+                      <p className="text-xs text-muted-foreground">We couldn't find any transaction records. Try adjusting your filters or search queries.</p>
+                    </div>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

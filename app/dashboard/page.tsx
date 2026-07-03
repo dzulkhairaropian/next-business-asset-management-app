@@ -243,10 +243,6 @@ export default function Page() {
 
           {/* Timeline Line Chart */}
           <div className="rounded-xl border bg-card text-card-foreground shadow-xs overflow-hidden">
-            <div className="p-6 pb-0">
-              <h2 className="font-semibold text-lg">Line Chart - Interactive</h2>
-              <p className="text-sm text-muted-foreground">Showing total purchases for the last 3 months</p>
-            </div>
             <InteractiveLineChart />
           </div>
 
@@ -588,15 +584,36 @@ const interactiveChartConfig = {
 
 function InteractiveLineChart() {
   const [activeCategory, setActiveCategory] = React.useState<"notebook" | "printer" | "accessories">("notebook")
+  const [selectedYear, setSelectedYear] = React.useState<"2026" | "2025" | "2024">("2026")
 
-  const chartData = [
-    { date: "2026-05-01", notebook: 12, printer: 8, accessories: 15 },
-    { date: "2026-05-15", notebook: 15, printer: 10, accessories: 12 },
-    { date: "2026-06-01", notebook: 22, printer: 14, accessories: 18 },
-    { date: "2026-06-15", notebook: 18, printer: 16, accessories: 20 },
-    { date: "2026-07-01", notebook: 25, printer: 12, accessories: 22 },
-    { date: "2026-07-15", notebook: 30, printer: 15, accessories: 25 },
-  ]
+  const chartDataMap = {
+    "2026": [
+      { date: "2026-05-01", notebook: 12, printer: 8, accessories: 15 },
+      { date: "2026-05-15", notebook: 15, printer: 10, accessories: 12 },
+      { date: "2026-06-01", notebook: 22, printer: 14, accessories: 18 },
+      { date: "2026-06-15", notebook: 18, printer: 16, accessories: 20 },
+      { date: "2026-07-01", notebook: 25, printer: 12, accessories: 22 },
+      { date: "2026-07-15", notebook: 30, printer: 15, accessories: 25 },
+    ],
+    "2025": [
+      { date: "2025-05-01", notebook: 18, printer: 12, accessories: 20 },
+      { date: "2025-05-15", notebook: 22, printer: 15, accessories: 18 },
+      { date: "2025-06-01", notebook: 30, printer: 20, accessories: 25 },
+      { date: "2025-06-15", notebook: 26, printer: 22, accessories: 28 },
+      { date: "2025-07-01", notebook: 35, printer: 18, accessories: 30 },
+      { date: "2025-07-15", notebook: 42, printer: 24, accessories: 35 },
+    ],
+    "2024": [
+      { date: "2024-05-01", notebook: 10, printer: 6, accessories: 12 },
+      { date: "2024-05-15", notebook: 12, printer: 8, accessories: 10 },
+      { date: "2024-06-01", notebook: 18, printer: 12, accessories: 15 },
+      { date: "2024-06-15", notebook: 15, printer: 14, accessories: 16 },
+      { date: "2024-07-01", notebook: 20, printer: 10, accessories: 18 },
+      { date: "2024-07-15", notebook: 24, printer: 12, accessories: 20 },
+    ]
+  }
+
+  const chartData = chartDataMap[selectedYear]
 
   const totals = React.useMemo(() => {
     return {
@@ -604,10 +621,34 @@ function InteractiveLineChart() {
       printer: chartData.reduce((acc, curr) => acc + curr.printer, 0),
       accessories: chartData.reduce((acc, curr) => acc + curr.accessories, 0),
     }
-  }, [])
+  }, [chartData])
 
   return (
     <div className="flex flex-col gap-4 w-full">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 pt-6">
+        <div>
+          <h2 className="font-semibold text-lg">Line Chart - Interactive</h2>
+          <p className="text-xs md:text-sm text-muted-foreground">Showing total purchases for the last 3 months</p>
+        </div>
+        <div className="flex items-center gap-2 self-end md:self-auto">
+          <span className="text-xs text-muted-foreground font-medium">Select Year:</span>
+          <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg border">
+            {(["2026", "2025", "2024"] as const).map((year) => (
+              <button
+                key={year}
+                onClick={() => setSelectedYear(year)}
+                className={`px-3 py-1 text-xs rounded-md font-semibold transition-all cursor-pointer ${
+                  selectedYear === year
+                    ? "bg-background text-foreground shadow-xs border"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                }`}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="flex border-b">
         {(["notebook", "printer", "accessories"] as const).map((key) => {
           const config = interactiveChartConfig[key]

@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { MoreVerticalIcon } from "lucide-react"
+import { MoreVerticalIcon, EyeIcon, EditIcon, ArrowUpRightIcon, TrashIcon } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
@@ -151,17 +151,20 @@ export const columns: ColumnDef<Asset>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40 text-xs">
               <DropdownMenuItem asChild>
-                <Link href="/it-assets/details">
+                <Link href="/it-assets/details" className="flex items-center">
+                  <EyeIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                   View Details
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/it-assets/edit">
+                <Link href="/it-assets/edit" className="flex items-center">
+                  <EditIcon className="mr-2 h-3.5 w-3.5" />
                   Edit Asset
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/it-assets/checkout">
+                <Link href="/it-assets/checkout" className="flex items-center">
+                  <ArrowUpRightIcon className="mr-2 h-3.5 w-3.5 text-blue-500" />
                   Checkout
                 </Link>
               </DropdownMenuItem>
@@ -170,6 +173,7 @@ export const columns: ColumnDef<Asset>[] = [
                 onClick={() => alert(`Deleting asset: ${asset.tag}`)}
                 className="text-rose-600 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/20"
               >
+                <TrashIcon className="mr-2 h-3.5 w-3.5" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

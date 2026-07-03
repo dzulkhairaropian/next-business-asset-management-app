@@ -17,7 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { DownloadIcon, SearchIcon } from "lucide-react"
+import { DownloadIcon, SearchIcon, FilterIcon } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   flexRender,
@@ -46,6 +46,7 @@ const mockTransactions: GaTxn[] = [
 
 export default function GaAssetTransactionsPage() {
   const [globalFilter, setGlobalFilter] = React.useState("")
+  const [showFilters, setShowFilters] = React.useState(false)
 
   const table = useReactTable({
     data: mockTransactions,
@@ -100,15 +101,56 @@ export default function GaAssetTransactionsPage() {
           </div>
 
           {/* Filters */}
-          <div className="relative max-w-md">
-            <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search transactions..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              className="pl-9 h-10 w-full text-sm"
-            />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search transactions..."
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                className="pl-9 h-10 w-full text-sm"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className={`h-10 text-xs font-semibold gap-1.5 ${
+                  showFilters
+                    ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15"
+                    : "bg-background text-foreground"
+                }`}
+              >
+                <FilterIcon className="h-4 w-4" />
+                Filters
+              </Button>
+            </div>
           </div>
+
+          {/* Expandable Filter Panel */}
+          {showFilters && (
+            <div className="p-5 rounded-xl border bg-card/50 flex flex-wrap gap-3 animate-in slide-in-from-top-2 duration-200">
+              <div className="flex flex-col gap-1.5 min-w-[150px]">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Transaction Type</span>
+                <select className="h-9 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer">
+                  <option value="">All Types</option>
+                  <option value="checkout">Checkout</option>
+                  <option value="restock">Restock</option>
+                  <option value="return">Return</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5 min-w-[150px]">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Processor</span>
+                <select className="h-9 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer">
+                  <option value="">All Processors</option>
+                  <option value="dzul">Dzul Khair</option>
+                  <option value="admin">Admin GA</option>
+                </select>
+              </div>
+            </div>
+          )}
 
           {/* Table Card */}
           <div className="rounded-xl border bg-card text-card-foreground shadow-xs overflow-hidden">

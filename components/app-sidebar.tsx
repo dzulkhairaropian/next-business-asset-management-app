@@ -126,7 +126,7 @@ const data = {
   ],
   navConsumables: [
     {
-      title: "Consumables",
+      title: "IT Consumables",
       url: "#",
       icon: (
         <PackageIcon />
@@ -134,11 +134,28 @@ const data = {
       items: [
         {
           title: "Inventory",
-          url: "/consumables/inventory",
+          url: "/it-consumables/inventory",
         },
         {
           title: "Transactions",
-          url: "/consumables/transactions",
+          url: "/it-consumables/transactions",
+        },
+      ],
+    },
+    {
+      title: "GA Consumables",
+      url: "#",
+      icon: (
+        <Building2Icon />
+      ),
+      items: [
+        {
+          title: "Inventory",
+          url: "/ga-consumables/inventory",
+        },
+        {
+          title: "Transactions",
+          url: "/ga-consumables/transactions",
         },
       ],
     },

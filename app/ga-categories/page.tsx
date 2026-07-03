@@ -17,7 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { PlusIcon, SearchIcon } from "lucide-react"
+import { PlusIcon, SearchIcon, FilterIcon } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   flexRender,
@@ -44,6 +44,7 @@ const mockCategories: GaCategory[] = [
 
 export default function GaAssetCategoriesPage() {
   const [globalFilter, setGlobalFilter] = React.useState("")
+  const [showFilters, setShowFilters] = React.useState(false)
 
   const table = useReactTable({
     data: mockCategories,
@@ -97,15 +98,55 @@ export default function GaAssetCategoriesPage() {
           </div>
 
           {/* Filters */}
-          <div className="relative max-w-md">
-            <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search categories..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              className="pl-9 h-10 w-full text-sm"
-            />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search categories..."
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                className="pl-9 h-10 w-full text-sm"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className={`h-10 text-xs font-semibold gap-1.5 ${
+                  showFilters
+                    ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15"
+                    : "bg-background text-foreground"
+                }`}
+              >
+                <FilterIcon className="h-4 w-4" />
+                Filters
+              </Button>
+            </div>
           </div>
+
+          {/* Expandable Filter Panel */}
+          {showFilters && (
+            <div className="p-5 rounded-xl border bg-card/50 flex flex-wrap gap-3 animate-in slide-in-from-top-2 duration-200">
+              <div className="flex flex-col gap-1.5 min-w-[150px]">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Depreciation Method</span>
+                <select className="h-9 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer">
+                  <option value="">Depreciation Method</option>
+                  <option value="straight-line">Straight Line</option>
+                  <option value="double-declining">Double Declining</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5 min-w-[150px]">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Useful Life</span>
+                <select className="h-9 px-3 rounded-md border border-input bg-background text-xs font-medium text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer">
+                  <option value="">Useful Life</option>
+                  <option value="5y">5 Years</option>
+                  <option value="8y">8 Years</option>
+                  <option value="10y">10 Years</option>
+                </select>
+              </div>
+            </div>
+          )}
 
           {/* Table Card */}
           <div className="rounded-xl border bg-card text-card-foreground shadow-xs overflow-hidden">
