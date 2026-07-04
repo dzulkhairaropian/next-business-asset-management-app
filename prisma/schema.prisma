@@ -1,0 +1,715 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model asset_checkouts {
+  id                                                  BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  asset_id                                            BigInt       @db.UnsignedBigInt
+  checked_out_by_user_id                              BigInt       @db.UnsignedBigInt
+  checked_out_to_user_id                              BigInt       @db.UnsignedBigInt
+  supervisor_user_id                                  BigInt?      @db.UnsignedBigInt
+  department_id                                       BigInt?      @db.UnsignedBigInt
+  location_id                                         BigInt?      @db.UnsignedBigInt
+  checkout_evidence_file_path                         String?      @db.VarChar(255)
+  checkout_evidence_file_name                         String?      @db.VarChar(255)
+  checked_out_at                                      DateTime?    @db.Timestamp(0)
+  checkout_notes                                      String?      @db.Text
+  checked_in_at                                       DateTime?    @db.Timestamp(0)
+  checked_in_by_user_id                               BigInt?      @db.UnsignedBigInt
+  condition_report                                    String?      @db.Text
+  checkin_evidence_file_path                          String?      @db.VarChar(255)
+  checkin_evidence_file_name                          String?      @db.VarChar(255)
+  checkin_notes                                       String?      @db.Text
+  created_at                                          DateTime?    @db.Timestamp(0)
+  updated_at                                          DateTime?    @db.Timestamp(0)
+  assets_asset_checkouts_asset_idToassets             assets       @relation("asset_checkouts_asset_idToassets", fields: [asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "asset_checkouts_asset_id_foreign")
+  users_asset_checkouts_checked_in_by_user_idTousers  users?       @relation("asset_checkouts_checked_in_by_user_idTousers", fields: [checked_in_by_user_id], references: [id], onUpdate: NoAction, map: "asset_checkouts_checked_in_by_user_id_foreign")
+  users_asset_checkouts_checked_out_by_user_idTousers users        @relation("asset_checkouts_checked_out_by_user_idTousers", fields: [checked_out_by_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "asset_checkouts_checked_out_by_user_id_foreign")
+  users_asset_checkouts_checked_out_to_user_idTousers users        @relation("asset_checkouts_checked_out_to_user_idTousers", fields: [checked_out_to_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "asset_checkouts_checked_out_to_user_id_foreign")
+  departments                                         departments? @relation(fields: [department_id], references: [id], onUpdate: NoAction, map: "asset_checkouts_department_id_foreign")
+  locations                                           locations?   @relation(fields: [location_id], references: [id], onUpdate: NoAction, map: "asset_checkouts_location_id_foreign")
+  users_asset_checkouts_supervisor_user_idTousers     users?       @relation("asset_checkouts_supervisor_user_idTousers", fields: [supervisor_user_id], references: [id], onUpdate: NoAction, map: "asset_checkouts_supervisor_user_id_foreign")
+  assets_assets_current_checkout_idToasset_checkouts  assets[]     @relation("assets_current_checkout_idToasset_checkouts")
+
+  @@index([asset_id, checked_out_at], map: "asset_checkouts_asset_id_checked_out_at_index")
+  @@index([checked_in_by_user_id], map: "asset_checkouts_checked_in_by_user_id_foreign")
+  @@index([checked_out_by_user_id], map: "asset_checkouts_checked_out_by_user_id_foreign")
+  @@index([checked_out_to_user_id, checked_out_at], map: "asset_checkouts_checked_out_to_user_id_checked_out_at_index")
+  @@index([department_id], map: "asset_checkouts_department_id_foreign")
+  @@index([location_id], map: "asset_checkouts_location_id_foreign")
+  @@index([supervisor_user_id], map: "asset_checkouts_supervisor_user_id_index")
+}
+
+model asset_maintenances {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  asset_id           BigInt    @db.UnsignedBigInt
+  service_provider   String?   @db.VarChar(255)
+  start_date         DateTime  @db.Date
+  completion_date    DateTime? @db.Date
+  cost               Decimal?  @db.Decimal(15, 2)
+  description        String?   @db.Text
+  evidence_file_path String?   @db.VarChar(255)
+  notes              String?   @db.Text
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+  assets             assets    @relation(fields: [asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "asset_maintenances_asset_id_foreign")
+
+  @@index([asset_id], map: "asset_maintenances_asset_id_foreign")
+}
+
+model assets {
+  id                                                          BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  parent_asset_id                                             BigInt?              @db.UnsignedBigInt
+  department_id                                               BigInt?              @db.UnsignedBigInt
+  product_id                                                  BigInt?              @db.UnsignedBigInt
+  operating_system_id                                         BigInt?              @db.UnsignedBigInt
+  status_id                                                   BigInt?              @db.UnsignedBigInt
+  location_id                                                 BigInt?              @db.UnsignedBigInt
+  vendor_id                                                   BigInt?              @db.UnsignedBigInt
+  assigned_to_user_id                                         BigInt?              @db.UnsignedBigInt
+  asset_tag                                                   String?              @unique(map: "assets_asset_tag_unique") @db.VarChar(255)
+  serial_number                                               String?              @db.VarChar(255)
+  product_number                                              String?              @db.VarChar(255)
+  device_name                                                 String?              @db.VarChar(255)
+  user_name                                                   String?              @db.VarChar(255)
+  license_windows                                             String?              @db.VarChar(255)
+  license_office                                              String?              @db.VarChar(255)
+  mac_address_wireless                                        String?              @db.VarChar(255)
+  mac_address_ethernet                                        String?              @db.VarChar(255)
+  specification                                               String?              @db.Text
+  accessories                                                 String?              @db.Text
+  purchase_date                                               DateTime?            @db.Date
+  release_date                                                DateTime?            @db.Date
+  warranty_expiry_date                                        DateTime?            @db.Date
+  purchase_cost                                               Decimal?             @db.Decimal(15, 2)
+  invoice_number                                              String?              @db.VarChar(255)
+  notes                                                       String?              @db.Text
+  retired_at                                                  DateTime?            @db.Date
+  retirement_reason                                           String?              @db.VarChar(255)
+  retirement_notes                                            String?              @db.Text
+  created_at                                                  DateTime?            @db.Timestamp(0)
+  updated_at                                                  DateTime?            @db.Timestamp(0)
+  deleted_at                                                  DateTime?            @db.Timestamp(0)
+  current_checkout_id                                         BigInt?              @db.UnsignedBigInt
+  asset_checkouts_asset_checkouts_asset_idToassets            asset_checkouts[]    @relation("asset_checkouts_asset_idToassets")
+  asset_maintenances                                          asset_maintenances[]
+  users                                                       users?               @relation(fields: [assigned_to_user_id], references: [id], onUpdate: NoAction, map: "assets_assigned_to_user_id_foreign")
+  asset_checkouts_assets_current_checkout_idToasset_checkouts asset_checkouts?     @relation("assets_current_checkout_idToasset_checkouts", fields: [current_checkout_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "assets_current_checkout_id_foreign")
+  assets                                                      assets?              @relation("assetsToassets", fields: [parent_asset_id], references: [id], onUpdate: NoAction, map: "assets_parent_asset_id_foreign")
+  other_assets                                                assets[]             @relation("assetsToassets")
+
+  @@index([assigned_to_user_id], map: "assets_assigned_to_user_id_foreign")
+  @@index([current_checkout_id], map: "assets_current_checkout_id_foreign")
+  @@index([device_name], map: "assets_device_name_index")
+  @@index([invoice_number], map: "assets_invoice_number_index")
+  @@index([parent_asset_id], map: "assets_parent_asset_id_foreign")
+  @@index([product_number], map: "assets_product_number_index")
+  @@index([serial_number], map: "assets_serial_number_index")
+  @@index([user_name], map: "assets_user_name_index")
+}
+
+model brands {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String?   @db.VarChar(255)
+  code        String?   @unique(map: "brands_code_unique") @db.VarChar(255)
+  website     String?   @db.VarChar(255)
+  description String?   @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+
+  @@index([name], map: "brands_name_index")
+}
+
+model cache {
+  key        String @id @db.VarChar(255)
+  value      String @db.MediumText
+  expiration Int
+}
+
+model cache_locks {
+  key        String @id @db.VarChar(255)
+  owner      String @db.VarChar(255)
+  expiration Int
+}
+
+model categories {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name               String?   @db.VarChar(255)
+  code               String?   @unique(map: "categories_code_unique") @db.VarChar(255)
+  master_category_id BigInt?   @db.UnsignedBigInt
+  description        String?   @db.VarChar(255)
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+  deleted_at         DateTime? @db.Timestamp(0)
+
+  @@index([code], map: "categories_code_index")
+  @@index([name], map: "categories_name_index")
+}
+
+model companies {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String?   @db.VarChar(255)
+  code       String?   @unique(map: "companies_code_unique") @db.VarChar(255)
+  email      String?   @unique(map: "companies_email_unique") @db.VarChar(255)
+  phone      String?   @unique(map: "companies_phone_unique") @db.VarChar(255)
+  website    String?   @db.VarChar(255)
+  address    String?   @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+
+  @@index([name], map: "companies_name_index")
+}
+
+model consumable_request_items {
+  id                    BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  consumable_request_id BigInt    @db.UnsignedBigInt
+  consumable_id         BigInt    @db.UnsignedBigInt
+  quantity_requested    Int
+  quantity_fulfilled    Int?
+  notes                 String?   @db.Text
+  created_at            DateTime? @db.Timestamp(0)
+  updated_at            DateTime? @db.Timestamp(0)
+
+  @@index([consumable_id], map: "consumable_request_items_consumable_id_foreign")
+  @@index([consumable_request_id], map: "consumable_request_items_consumable_request_id_foreign")
+}
+
+model consumable_requests {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  request_number String    @unique(map: "consumable_requests_request_number_unique") @db.VarChar(255)
+  requester_id   BigInt    @db.UnsignedBigInt
+  department_id  BigInt?   @db.UnsignedBigInt
+  location_id    BigInt?   @db.UnsignedBigInt
+  processed_by   BigInt?   @db.UnsignedBigInt
+  status         String    @default("pending") @db.VarChar(255)
+  requested_at   DateTime  @default(now()) @db.Timestamp(0)
+  processed_at   DateTime? @db.Timestamp(0)
+  notes          String?   @db.Text
+  admin_notes    String?   @db.Text
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([department_id], map: "consumable_requests_department_id_foreign")
+  @@index([location_id], map: "consumable_requests_location_id_foreign")
+  @@index([processed_by], map: "consumable_requests_processed_by_foreign")
+  @@index([requester_id], map: "consumable_requests_requester_id_foreign")
+}
+
+model consumable_transactions {
+  id                                                          BigInt                       @id @default(autoincrement()) @db.UnsignedBigInt
+  consumable_id                                               BigInt                       @db.UnsignedBigInt
+  user_id                                                     BigInt?                      @db.UnsignedBigInt
+  checked_out_to_user_id                                      BigInt?                      @db.UnsignedBigInt
+  type                                                        consumable_transactions_type
+  quantity                                                    Int
+  quantity_before                                             Int
+  quantity_after                                              Int
+  unit_cost                                                   Decimal?                     @db.Decimal(15, 2)
+  total_cost                                                  Decimal?                     @db.Decimal(15, 2)
+  evidence_file_path                                          String?                      @db.VarChar(255)
+  notes                                                       String?                      @db.Text
+  transaction_date                                            DateTime                     @default(now()) @db.Timestamp(0)
+  created_at                                                  DateTime?                    @db.Timestamp(0)
+  updated_at                                                  DateTime?                    @db.Timestamp(0)
+  users_consumable_transactions_checked_out_to_user_idTousers users?                       @relation("consumable_transactions_checked_out_to_user_idTousers", fields: [checked_out_to_user_id], references: [id], onUpdate: NoAction, map: "consumable_transactions_checked_out_to_user_id_foreign")
+  consumables                                                 consumables                  @relation(fields: [consumable_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "consumable_transactions_consumable_id_foreign")
+  users_consumable_transactions_user_idTousers                users?                       @relation("consumable_transactions_user_idTousers", fields: [user_id], references: [id], onUpdate: NoAction, map: "consumable_transactions_user_id_foreign")
+
+  @@index([checked_out_to_user_id], map: "consumable_transactions_checked_out_to_user_id_foreign")
+  @@index([consumable_id], map: "consumable_transactions_consumable_id_foreign")
+  @@index([user_id], map: "consumable_transactions_user_id_foreign")
+}
+
+model consumables {
+  id                      BigInt                    @id @default(autoincrement()) @db.UnsignedBigInt
+  product_id              BigInt?                   @db.UnsignedBigInt
+  status_id               BigInt?                   @db.UnsignedBigInt
+  notes                   String?                   @db.Text
+  quantity                Int?
+  low_threshold           Int?
+  purchase_cost           Decimal?                  @db.Decimal(15, 2)
+  created_at              DateTime?                 @db.Timestamp(0)
+  updated_at              DateTime?                 @db.Timestamp(0)
+  deleted_at              DateTime?                 @db.Timestamp(0)
+  consumable_transactions consumable_transactions[]
+}
+
+model departments {
+  id              BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  name            String?           @db.VarChar(255)
+  code            String?           @unique(map: "departments_code_unique") @db.VarChar(255)
+  company_id      BigInt?           @db.UnsignedBigInt
+  description     String?           @db.VarChar(255)
+  created_at      DateTime?         @db.Timestamp(0)
+  updated_at      DateTime?         @db.Timestamp(0)
+  deleted_at      DateTime?         @db.Timestamp(0)
+  asset_checkouts asset_checkouts[]
+
+  @@index([name], map: "departments_name_index")
+}
+
+model exports {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  completed_at    DateTime? @db.Timestamp(0)
+  file_disk       String    @db.VarChar(255)
+  file_name       String?   @db.VarChar(255)
+  exporter        String    @db.VarChar(255)
+  processed_rows  Int       @default(0) @db.UnsignedInt
+  total_rows      Int       @db.UnsignedInt
+  successful_rows Int       @default(0) @db.UnsignedInt
+  user_id         BigInt    @db.UnsignedBigInt
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+  users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "exports_user_id_foreign")
+
+  @@index([user_id], map: "exports_user_id_foreign")
+}
+
+model failed_import_rows {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  data             String    @db.LongText
+  import_id        BigInt    @db.UnsignedBigInt
+  validation_error String?   @db.Text
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+  imports          imports   @relation(fields: [import_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "failed_import_rows_import_id_foreign")
+
+  @@index([import_id], map: "failed_import_rows_import_id_foreign")
+}
+
+model failed_jobs {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String   @unique(map: "failed_jobs_uuid_unique") @db.VarChar(255)
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model ga_asset_assignments {
+  id                                                       BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  asset_id                                                 BigInt    @db.UnsignedBigInt
+  user_id                                                  BigInt    @db.UnsignedBigInt
+  checked_out_by_user_id                                   BigInt?   @db.UnsignedBigInt
+  supervisor_user_id                                       BigInt?   @db.UnsignedBigInt
+  assigned_at                                              DateTime  @db.DateTime(0)
+  returned_at                                              DateTime? @db.DateTime(0)
+  checked_in_by_user_id                                    BigInt?   @db.UnsignedBigInt
+  notes                                                    String?   @db.Text
+  checkout_evidence                                        String?   @db.VarChar(255)
+  checkin_evidence                                         String?   @db.VarChar(255)
+  condition_on_return                                      String?   @db.VarChar(255)
+  checkin_notes                                            String?   @db.Text
+  created_at                                               DateTime? @db.Timestamp(0)
+  updated_at                                               DateTime? @db.Timestamp(0)
+  ga_assets                                                ga_assets @relation(fields: [asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ga_asset_assignments_asset_id_foreign")
+  users_ga_asset_assignments_checked_in_by_user_idTousers  users?    @relation("ga_asset_assignments_checked_in_by_user_idTousers", fields: [checked_in_by_user_id], references: [id], onUpdate: NoAction, map: "ga_asset_assignments_checked_in_by_user_id_foreign")
+  users_ga_asset_assignments_checked_out_by_user_idTousers users?    @relation("ga_asset_assignments_checked_out_by_user_idTousers", fields: [checked_out_by_user_id], references: [id], onUpdate: NoAction, map: "ga_asset_assignments_checked_out_by_user_id_foreign")
+  users_ga_asset_assignments_supervisor_user_idTousers     users?    @relation("ga_asset_assignments_supervisor_user_idTousers", fields: [supervisor_user_id], references: [id], onUpdate: NoAction, map: "ga_asset_assignments_supervisor_user_id_foreign")
+  users_ga_asset_assignments_user_idTousers                users     @relation("ga_asset_assignments_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ga_asset_assignments_user_id_foreign")
+
+  @@index([asset_id], map: "ga_asset_assignments_asset_id_foreign")
+  @@index([checked_in_by_user_id], map: "ga_asset_assignments_checked_in_by_user_id_foreign")
+  @@index([checked_out_by_user_id], map: "ga_asset_assignments_checked_out_by_user_id_foreign")
+  @@index([supervisor_user_id], map: "ga_asset_assignments_supervisor_user_id_foreign")
+  @@index([user_id], map: "ga_asset_assignments_user_id_foreign")
+}
+
+model ga_asset_categories {
+  id                     BigInt                   @id @default(autoincrement()) @db.UnsignedBigInt
+  name                   String                   @db.VarChar(255)
+  code_prefix            String                   @unique(map: "ga_asset_categories_code_prefix_unique") @db.VarChar(255)
+  depreciation_method    String                   @default("straight_line") @db.VarChar(255)
+  useful_life_years      Int                      @default(5)
+  created_at             DateTime?                @db.Timestamp(0)
+  updated_at             DateTime?                @db.Timestamp(0)
+  ga_asset_subcategories ga_asset_subcategories[]
+  ga_assets              ga_assets[]
+}
+
+model ga_asset_subcategories {
+  id                  BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  category_id         BigInt              @db.UnsignedBigInt
+  name                String              @db.VarChar(100)
+  created_at          DateTime?           @db.Timestamp(0)
+  updated_at          DateTime?           @db.Timestamp(0)
+  ga_asset_categories ga_asset_categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ga_asset_subcategories_category_id_foreign")
+  ga_assets           ga_assets[]
+
+  @@index([category_id], map: "ga_asset_subcategories_category_id_foreign")
+}
+
+model ga_asset_vehicles {
+  id                      BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  asset_id                BigInt    @unique(map: "ga_asset_vehicles_asset_id_unique") @db.UnsignedBigInt
+  license_plate           String?   @db.VarChar(20)
+  chassis_number          String?   @db.VarChar(100)
+  engine_number           String?   @db.VarChar(100)
+  bpkb_number             String?   @db.VarChar(100)
+  stnk_number             String?   @db.VarChar(100)
+  tax_due_date            DateTime? @db.Date
+  last_service_date       DateTime? @db.Date
+  last_odometer           Int?
+  insurance_policy_number String?   @db.VarChar(100)
+  insurance_expiry_date   DateTime? @db.Date
+  fuel_consumption        Decimal?  @db.Decimal(8, 2)
+  created_at              DateTime? @db.Timestamp(0)
+  updated_at              DateTime? @db.Timestamp(0)
+  ga_assets               ga_assets @relation(fields: [asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ga_asset_vehicles_asset_id_foreign")
+}
+
+model ga_assets {
+  id                       BigInt                       @id @default(autoincrement()) @db.UnsignedBigInt
+  category_id              BigInt                       @db.UnsignedBigInt
+  subcategory_id           BigInt?                      @db.UnsignedBigInt
+  brand                    String?                      @db.VarChar(100)
+  model                    String?                      @db.VarChar(100)
+  name                     String                       @db.VarChar(150)
+  qty                      Int                          @default(1) @db.UnsignedInt
+  asset_code               String                       @unique(map: "ga_assets_asset_tag_unique") @db.VarChar(50)
+  inventory_number         String?                      @db.VarChar(100)
+  serial_number            String?                      @db.VarChar(100)
+  acquisition_year         Int?                         @db.Year
+  acquisition_source       ga_assets_acquisition_source @default(Pembelian)
+  purchase_date            DateTime                     @db.Date
+  vendor_name              String?                      @db.VarChar(150)
+  invoice_number           String?                      @db.VarChar(100)
+  purchase_price           Decimal                      @db.Decimal(15, 2)
+  additional_cost          Decimal                      @default(0.00) @db.Decimal(15, 2)
+  total_asset_value        Decimal?                     @db.Decimal(15, 2)
+  warranty_period_month    Int?
+  warranty_expiry_date     DateTime?                    @db.Date
+  current_value            Decimal?                     @db.Decimal(15, 2)
+  status                   String                       @default("Available") @db.VarChar(255)
+  retired_at               DateTime?                    @db.Date
+  retirement_reason        String?                      @db.VarChar(255)
+  retirement_notes         String?                      @db.Text
+  retirement_evidence_path String?                      @db.VarChar(255)
+  image                    String?                      @db.VarChar(255)
+  current_holder_id        BigInt?                      @db.UnsignedBigInt
+  deleted_at               DateTime?                    @db.Timestamp(0)
+  created_at               DateTime?                    @db.Timestamp(0)
+  updated_at               DateTime?                    @db.Timestamp(0)
+  ga_asset_assignments     ga_asset_assignments[]
+  ga_asset_vehicles        ga_asset_vehicles?
+  ga_asset_categories      ga_asset_categories          @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ga_assets_category_id_foreign")
+  users                    users?                       @relation(fields: [current_holder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ga_assets_current_holder_id_foreign")
+  ga_asset_subcategories   ga_asset_subcategories?      @relation(fields: [subcategory_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ga_assets_subcategory_id_foreign")
+  ga_maintenance_logs      ga_maintenance_logs[]
+
+  @@index([category_id], map: "ga_assets_category_id_foreign")
+  @@index([current_holder_id], map: "ga_assets_current_holder_id_foreign")
+  @@index([subcategory_id], map: "ga_assets_subcategory_id_foreign")
+}
+
+model ga_maintenance_logs {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  asset_id       BigInt    @db.UnsignedBigInt
+  type           String    @db.VarChar(255)
+  cost           Decimal   @db.Decimal(15, 2)
+  vendor         String?   @db.VarChar(255)
+  scheduled_date DateTime  @db.Date
+  completed_date DateTime? @db.Date
+  notes          String?   @db.Text
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+  ga_assets      ga_assets @relation(fields: [asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ga_maintenance_logs_asset_id_foreign")
+
+  @@index([asset_id], map: "ga_maintenance_logs_asset_id_foreign")
+}
+
+model imports {
+  id                 BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  completed_at       DateTime?            @db.Timestamp(0)
+  file_name          String               @db.VarChar(255)
+  file_path          String               @db.VarChar(255)
+  importer           String               @db.VarChar(255)
+  processed_rows     Int                  @default(0) @db.UnsignedInt
+  total_rows         Int                  @db.UnsignedInt
+  successful_rows    Int                  @default(0) @db.UnsignedInt
+  user_id            BigInt               @db.UnsignedBigInt
+  created_at         DateTime?            @db.Timestamp(0)
+  updated_at         DateTime?            @db.Timestamp(0)
+  failed_import_rows failed_import_rows[]
+  users              users                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "imports_user_id_foreign")
+
+  @@index([user_id], map: "imports_user_id_foreign")
+}
+
+model job_batches {
+  id             String  @id @db.VarChar(255)
+  name           String  @db.VarChar(255)
+  total_jobs     Int
+  pending_jobs   Int
+  failed_jobs    Int
+  failed_job_ids String  @db.LongText
+  options        String? @db.MediumText
+  cancelled_at   Int?
+  created_at     Int
+  finished_at    Int?
+}
+
+model job_positions {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String?   @db.VarChar(255)
+  code        String?   @unique(map: "job_positions_code_unique") @db.VarChar(255)
+  description String?   @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+
+  @@index([name], map: "job_positions_name_index")
+}
+
+model jobs {
+  id           BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  queue        String @db.VarChar(255)
+  payload      String @db.LongText
+  attempts     Int    @db.UnsignedTinyInt
+  reserved_at  Int?   @db.UnsignedInt
+  available_at Int    @db.UnsignedInt
+  created_at   Int    @db.UnsignedInt
+
+  @@index([queue], map: "jobs_queue_index")
+}
+
+model locations {
+  id              BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  name            String?           @db.VarChar(255)
+  company_id      BigInt?           @db.UnsignedBigInt
+  description     String?           @db.VarChar(255)
+  created_at      DateTime?         @db.Timestamp(0)
+  updated_at      DateTime?         @db.Timestamp(0)
+  deleted_at      DateTime?         @db.Timestamp(0)
+  asset_checkouts asset_checkouts[]
+  users           users[]
+
+  @@index([name], map: "locations_name_index")
+}
+
+model master_categories {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String?   @db.VarChar(255)
+  description String?   @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+
+  @@index([name], map: "master_categories_name_index")
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+model model_has_permissions {
+  permission_id BigInt      @db.UnsignedBigInt
+  model_type    String      @db.VarChar(255)
+  model_id      BigInt      @db.UnsignedBigInt
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "model_has_permissions_permission_id_foreign")
+
+  @@id([permission_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_permissions_model_id_model_type_index")
+}
+
+model model_has_roles {
+  role_id    BigInt @db.UnsignedBigInt
+  model_type String @db.VarChar(255)
+  model_id   BigInt @db.UnsignedBigInt
+  roles      roles  @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "model_has_roles_role_id_foreign")
+
+  @@id([role_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_roles_model_id_model_type_index")
+}
+
+model notifications {
+  id              String    @id @db.Char(36)
+  type            String    @db.VarChar(255)
+  notifiable_type String    @db.VarChar(255)
+  notifiable_id   BigInt    @db.UnsignedBigInt
+  data            String    @db.Text
+  read_at         DateTime? @db.Timestamp(0)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+
+  @@index([notifiable_type, notifiable_id], map: "notifications_notifiable_type_notifiable_id_index")
+}
+
+model operating_systems {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String?   @db.VarChar(255)
+  brand_id    BigInt?   @db.UnsignedBigInt
+  description String?   @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+
+  @@index([name], map: "operating_systems_name_index")
+}
+
+model password_reset_tokens {
+  email      String    @id @db.VarChar(255)
+  token      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+}
+
+model permissions {
+  id                    BigInt                  @id @default(autoincrement()) @db.UnsignedBigInt
+  name                  String                  @db.VarChar(255)
+  guard_name            String                  @db.VarChar(255)
+  created_at            DateTime?               @db.Timestamp(0)
+  updated_at            DateTime?               @db.Timestamp(0)
+  model_has_permissions model_has_permissions[]
+  role_has_permissions  role_has_permissions[]
+
+  @@unique([name, guard_name], map: "permissions_name_guard_name_unique")
+}
+
+model positions {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String?   @db.VarChar(255)
+  code        String?   @unique(map: "positions_code_unique") @db.VarChar(255)
+  description String?   @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+  users       users[]
+
+  @@index([name], map: "positions_name_index")
+}
+
+model products {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name               String?   @db.VarChar(255)
+  product_type       String?   @db.VarChar(255)
+  brand_id           BigInt?   @db.UnsignedBigInt
+  category_id        BigInt?   @db.UnsignedBigInt
+  master_category_id BigInt?   @db.UnsignedBigInt
+  description        String?   @db.VarChar(255)
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+  deleted_at         DateTime? @db.Timestamp(0)
+
+  @@index([name], map: "products_name_index")
+  @@index([product_type], map: "products_product_type_index")
+}
+
+model role_has_permissions {
+  permission_id BigInt      @db.UnsignedBigInt
+  role_id       BigInt      @db.UnsignedBigInt
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "role_has_permissions_permission_id_foreign")
+  roles         roles       @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "role_has_permissions_role_id_foreign")
+
+  @@id([permission_id, role_id])
+  @@index([role_id], map: "role_has_permissions_role_id_foreign")
+}
+
+model roles {
+  id                   BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
+  name                 String                 @db.VarChar(255)
+  guard_name           String                 @db.VarChar(255)
+  created_at           DateTime?              @db.Timestamp(0)
+  updated_at           DateTime?              @db.Timestamp(0)
+  model_has_roles      model_has_roles[]
+  role_has_permissions role_has_permissions[]
+
+  @@unique([name, guard_name], map: "roles_name_guard_name_unique")
+}
+
+model sessions {
+  id            String  @id @db.VarChar(255)
+  user_id       BigInt? @db.UnsignedBigInt
+  ip_address    String? @db.VarChar(45)
+  user_agent    String? @db.Text
+  payload       String  @db.LongText
+  last_activity Int
+
+  @@index([last_activity], map: "sessions_last_activity_index")
+  @@index([user_id], map: "sessions_user_id_index")
+}
+
+model statuses {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name               String?   @db.VarChar(255)
+  icon               String?   @db.VarChar(255)
+  color              String?   @db.VarChar(255)
+  master_category_id BigInt?   @db.UnsignedBigInt
+  description        String?   @db.VarChar(255)
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+  deleted_at         DateTime? @db.Timestamp(0)
+
+  @@index([name], map: "statuses_name_index")
+}
+
+model users {
+  id                                                                            BigInt                    @id @default(autoincrement()) @db.UnsignedBigInt
+  name                                                                          String?                   @db.VarChar(255)
+  email                                                                         String?                   @unique(map: "users_email_unique") @db.VarChar(255)
+  phone                                                                         String?                   @unique(map: "users_phone_unique") @db.VarChar(255)
+  avatar                                                                        String?                   @db.VarChar(255)
+  email_verified_at                                                             DateTime?                 @db.Timestamp(0)
+  remember_token                                                                String?                   @db.VarChar(100)
+  password                                                                      String                    @db.VarChar(255)
+  department_id                                                                 BigInt?                   @db.UnsignedBigInt
+  position_id                                                                   BigInt?                   @db.UnsignedBigInt
+  company_id                                                                    BigInt?                   @db.UnsignedBigInt
+  location_id                                                                   BigInt?                   @db.UnsignedBigInt
+  created_at                                                                    DateTime?                 @db.Timestamp(0)
+  updated_at                                                                    DateTime?                 @db.Timestamp(0)
+  asset_checkouts_asset_checkouts_checked_in_by_user_idTousers                  asset_checkouts[]         @relation("asset_checkouts_checked_in_by_user_idTousers")
+  asset_checkouts_asset_checkouts_checked_out_by_user_idTousers                 asset_checkouts[]         @relation("asset_checkouts_checked_out_by_user_idTousers")
+  asset_checkouts_asset_checkouts_checked_out_to_user_idTousers                 asset_checkouts[]         @relation("asset_checkouts_checked_out_to_user_idTousers")
+  asset_checkouts_asset_checkouts_supervisor_user_idTousers                     asset_checkouts[]         @relation("asset_checkouts_supervisor_user_idTousers")
+  assets                                                                        assets[]
+  consumable_transactions_consumable_transactions_checked_out_to_user_idTousers consumable_transactions[] @relation("consumable_transactions_checked_out_to_user_idTousers")
+  consumable_transactions_consumable_transactions_user_idTousers                consumable_transactions[] @relation("consumable_transactions_user_idTousers")
+  exports                                                                       exports[]
+  ga_asset_assignments_ga_asset_assignments_checked_in_by_user_idTousers        ga_asset_assignments[]    @relation("ga_asset_assignments_checked_in_by_user_idTousers")
+  ga_asset_assignments_ga_asset_assignments_checked_out_by_user_idTousers       ga_asset_assignments[]    @relation("ga_asset_assignments_checked_out_by_user_idTousers")
+  ga_asset_assignments_ga_asset_assignments_supervisor_user_idTousers           ga_asset_assignments[]    @relation("ga_asset_assignments_supervisor_user_idTousers")
+  ga_asset_assignments_ga_asset_assignments_user_idTousers                      ga_asset_assignments[]    @relation("ga_asset_assignments_user_idTousers")
+  ga_assets                                                                     ga_assets[]
+  imports                                                                       imports[]
+  locations                                                                     locations?                @relation(fields: [location_id], references: [id], onUpdate: NoAction, map: "users_location_id_foreign")
+  positions                                                                     positions?                @relation(fields: [position_id], references: [id], onUpdate: NoAction, map: "users_position_id_foreign")
+
+  @@index([location_id], map: "users_location_id_foreign")
+  @@index([position_id], map: "users_position_id_foreign")
+}
+
+model vendors {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name           String?   @db.VarChar(255)
+  email          String?   @unique(map: "vendors_email_unique") @db.VarChar(255)
+  contact_person String?   @db.VarChar(255)
+  phone          String?   @unique(map: "vendors_phone_unique") @db.VarChar(255)
+  website        String?   @db.VarChar(255)
+  address        String?   @db.VarChar(255)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+  deleted_at     DateTime? @db.Timestamp(0)
+
+  @@index([name], map: "vendors_name_index")
+}
+
+enum consumable_transactions_type {
+  restock
+  checkout
+}
+
+enum ga_assets_acquisition_source {
+  Pembelian
+  Hibah
+  Sewa
+  Lainnya
+}

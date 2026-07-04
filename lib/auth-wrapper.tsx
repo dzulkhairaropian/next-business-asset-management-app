@@ -11,11 +11,11 @@ export function AuthWrapper({ children }: { children: React.ReactNode }) {
 
   const isAuthRoute = pathname?.startsWith("/auth")
 
-  React.useEffect(() => {
-    if (!isLoading && !user && !isAuthRoute) {
-      router.replace("/auth/login")
-    }
-  }, [user, isLoading, isAuthRoute, router])
+    // React.useEffect(() => {
+    //   if (!isLoading && !user && !isAuthRoute) {
+    //     router.replace("/auth/login")
+    //   }
+    // }, [user, isLoading, isAuthRoute, router])
 
   if (isLoading) {
     return (
@@ -25,9 +25,10 @@ export function AuthWrapper({ children }: { children: React.ReactNode }) {
     )
   }
 
-  if (!user && !isAuthRoute) {
-    return null
-  }
+  // TODO: re-enable auth guard before production
+  // if (!user && !isAuthRoute) {
+  //   return null
+  // }
 
   return <>{children}</>
 }

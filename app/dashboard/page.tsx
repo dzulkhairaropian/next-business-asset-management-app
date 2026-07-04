@@ -39,7 +39,159 @@ import {
   WrenchIcon,
 } from "lucide-react";
 
+interface Asset {
+  tag: string;
+  code: string;
+  name: string;
+  serial: string;
+  status: string;
+  holder: string;
+  dept: string;
+}
+
+interface Checkout {
+  tag: string;
+  name: string;
+  qty: string;
+  user: string;
+  dept: string;
+  date: string;
+}
+
+interface ConsumableCheckout {
+  name: string;
+  desc: string;
+  qty: string;
+  user: string;
+  date: string;
+}
+
+interface ConsumablesStock {
+  name: string;
+  desc: string;
+  qty: string;
+  status: string;
+}
+
+interface OldAsset {
+  tag: string;
+  name: string;
+  qty: string;
+  user: string;
+  dept: string;
+  date: string;
+}
+
+interface Category {
+  label: string;
+  value: number;
+  color: string;
+}
+
 export default function Page() {
+  const [assets, setAssets] = React.useState<Asset[]>([]);
+  const [checkouts, setCheckouts] = React.useState<Checkout[]>([]);
+  const [consumableCheckouts, setConsumableCheckouts] = React.useState<ConsumableCheckout[]>([]);
+  const [consumablesStock, setConsumablesStock] = React.useState<ConsumablesStock[]>([]);
+  const [oldAssets, setOldAssets] = React.useState<OldAsset[]>([]);
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [mostRequestedConsumables, setMostRequestedConsumables] = React.useState<Category[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    async function fetchData() {
+      try {
+        const [
+          assetsRes,
+          checkoutsRes,
+          consumableCheckoutsRes,
+          consumablesStockRes,
+          oldAssetsRes,
+          categoriesRes,
+          mostRequestedRes,
+        ] = await Promise.all([
+          fetch('/api/assets'),
+          fetch('/api/asset-checkouts'),
+          fetch('/api/consumable-checkouts'),
+          fetch('/api/consumables-stock'),
+          fetch('/api/old-assets'),
+          fetch('/api/categories'),
+          fetch('/api/most-requested-consumables'),
+        ]);
+        const assetsData = await assetsRes.json();
+        const checkoutsData = await checkoutsRes.json();
+        const consumableCheckoutsData = await consumableCheckoutsRes.json();
+        const consumablesStockData = await consumablesStockRes.json();
+        const oldAssetsData = await oldAssetsRes.json();
+        const categoriesData = await categoriesRes.json();
+        const mostRequestedData = await mostRequestedRes.json();
+        setAssets(assetsData);
+        setCheckouts(checkoutsData);
+        setConsumableCheckouts(consumableCheckoutsData);
+        setConsumablesStock(consumablesStockData);
+        setOldAssets(oldAssetsData);
+        setCategories(categoriesData);
+        setMostRequestedConsumables(mostRequestedData);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const totalAssets = assets.length;
+  const readyToDeploy = assets.filter((a) => a.status === "Ready to Deploy").length;
+  const deployed = assets.filter((a) => a.status === "Deployed").length;
+  const inService = assets.filter((a) => a.status === "Service").length;
+  const broken = assets.filter(
+    (a) => a.status === "Broken" || a.status === "Defective"
+  ).length;
+
+  const topProducts = React.useMemo(() => {
+    if (!assets || assets.length === 0) return [];
+
+    const productCounts = assets.reduce((acc, asset) => {
+      if (asset.name) {
+        acc[asset.name] = (acc[asset.name] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(productCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([label, value], index) => ({
+        label,
+        value,
+        color: ["var(--color-primary)", "#06b6d4", "#3b82f6", "#10b981", "#f59e0b"][index] || "#ccc",
+      }));
+  }, [assets]);
+
+  const byDepartment = React.useMemo(() => {
+    if (!assets || assets.length === 0) return [];
+
+    const deptCounts = assets.reduce((acc, asset) => {
+      if (asset.dept) {
+        acc[asset.dept] = (acc[asset.dept] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(deptCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([label, value], index) => ({
+        label,
+        value,
+        color: ["var(--color-primary)", "#10b981", "#a855f7", "#f97316", "#ec4899"][index] || "#ccc",
+      }));
+  }, [assets]);
+
+
+
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -81,7 +233,7 @@ export default function Page() {
                   <BoxesIcon className="h-4.5 w-4.5" />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold tracking-tight mt-1">108</div>
+              <div className="text-3xl font-extrabold tracking-tight mt-1">{loading ? '...' : totalAssets}</div>
               <p className="text-xs text-muted-foreground mt-2">
                 <span className="text-emerald-500 font-semibold inline-flex items-center gap-0.5">
                   <ArrowUpRightIcon className="h-3 w-3" /> +4.2%
@@ -89,7 +241,7 @@ export default function Page() {
                 active tracking
               </p>
             </div>
-            
+
             <div className="rounded-xl border bg-card p-5 text-card-foreground shadow-xs">
               <div className="flex items-center justify-between pb-2">
                 <span className="text-sm font-medium text-muted-foreground">Ready to Deploy</span>
@@ -97,7 +249,7 @@ export default function Page() {
                   <WrenchIcon className="h-4.5 w-4.5" />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold tracking-tight mt-1">6</div>
+              <div className="text-3xl font-extrabold tracking-tight mt-1">{loading ? '...' : readyToDeploy}</div>
               <p className="text-xs text-muted-foreground mt-2">
                 <span className="text-blue-500 font-semibold">Available</span> in inventory
               </p>
@@ -110,7 +262,7 @@ export default function Page() {
                   <ActivityIcon className="h-4.5 w-4.5" />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold tracking-tight mt-1">93</div>
+              <div className="text-3xl font-extrabold tracking-tight mt-1">{loading ? '...' : deployed}</div>
               <p className="text-xs text-muted-foreground mt-2">
                 <span className="text-emerald-500 font-semibold">Assigned</span> to employees
               </p>
@@ -123,9 +275,9 @@ export default function Page() {
                   <AlertTriangleIcon className="h-4.5 w-4.5" />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold tracking-tight mt-1">0</div>
+              <div className="text-3xl font-extrabold tracking-tight mt-1">{loading ? '...' : broken + inService}</div>
               <p className="text-xs text-muted-foreground mt-2">
-                <span className="text-emerald-500 font-semibold">Healthy</span> fleet status
+                Assets currently in repair
               </p>
             </div>
           </div>
@@ -141,10 +293,10 @@ export default function Page() {
               <div className="flex-1 flex items-center justify-center py-2">
                 <DonutChart
                   data={[
-                    { label: "Deployed", value: 93, color: "var(--color-primary)" },
-                    { label: "Ready to Deploy", value: 6, color: "#3b82f6" },
-                    { label: "Broken / Defective", value: 0, color: "#ef4444" },
-                    { label: "In Maintenance", value: 9, color: "#f59e0b" },
+                    { label: "Deployed", value: deployed, color: "var(--color-primary)" },
+                    { label: "Ready to Deploy", value: readyToDeploy, color: "#3b82f6" },
+                    { label: "Broken / Defective", value: broken, color: "#ef4444" },
+                    { label: "In Maintenance", value: inService, color: "#f59e0b" },
                   ]}
                 />
               </div>
@@ -157,15 +309,7 @@ export default function Page() {
                 <p className="text-xs text-muted-foreground">Asset allocation across departments.</p>
               </div>
               <div className="flex-1 flex items-center justify-center py-2">
-                <DonutChart
-                  data={[
-                    { label: "IT Dept", value: 45, color: "var(--color-primary)" },
-                    { label: "Operations", value: 30, color: "#10b981" },
-                    { label: "Finance & HR", value: 15, color: "#a855f7" },
-                    { label: "Marketing", value: 12, color: "#f97316" },
-                    { label: "Sales", value: 6, color: "#ec4899" },
-                  ]}
-                />
+                <DonutChart data={byDepartment} />
               </div>
             </div>
 
@@ -176,15 +320,7 @@ export default function Page() {
                 <p className="text-xs text-muted-foreground">Top items assigned to users.</p>
               </div>
               <div className="flex-1 flex items-center justify-center py-2">
-                <DonutChart
-                  data={[
-                    { label: "MacBook Pro 16\"", value: 35, color: "var(--color-primary)" },
-                    { label: "Dell 27\" Monitor", value: 25, color: "#06b6d4" },
-                    { label: "ThinkPad T14", value: 20, color: "#3b82f6" },
-                    { label: "iPhone 15 Pro", value: 15, color: "#10b981" },
-                    { label: "iPad Pro 12.9\"", value: 13, color: "#f59e0b" },
-                  ]}
-                />
+                <DonutChart data={topProducts} />
               </div>
             </div>
 
@@ -195,13 +331,7 @@ export default function Page() {
                 <p className="text-xs text-muted-foreground">Distribution across hardware categories.</p>
               </div>
               <div className="flex-1 flex items-center justify-center py-2">
-                <DonutChart
-                  data={[
-                    { label: "IT & Hardware", value: 65, color: "var(--color-primary)" },
-                    { label: "Software Licenses", value: 25, color: "#8b5cf6" },
-                    { label: "Mobile Devices", value: 18, color: "#14b8a6" },
-                  ]}
-                />
+                <DonutChart data={categories} />
               </div>
             </div>
 
@@ -212,15 +342,7 @@ export default function Page() {
                 <p className="text-xs text-muted-foreground">Highest demand auxiliary assets.</p>
               </div>
               <div className="flex-1 flex items-center justify-center py-2">
-                <DonutChart
-                  data={[
-                    { label: "Wireless Mouse", value: 40, color: "var(--color-primary)" },
-                    { label: "USB-C Hub", value: 35, color: "#eab308" },
-                    { label: "HDMI Cable", value: 25, color: "#3b82f6" },
-                    { label: "Keyboard", value: 20, color: "#ef4444" },
-                    { label: "AA Batteries", value: 15, color: "#10b981" },
-                  ]}
-                />
+                <DonutChart data={mostRequestedConsumables} />
               </div>
             </div>
 
@@ -275,13 +397,7 @@ export default function Page() {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {[
-                          { tag: "DBHDDIT-001", name: "Western Digital • My Passport", qty: "1 pcs", user: "Dzul Khair Aropian", dept: "Information Technology", date: "Jun 30, 00:00" },
-                          { tag: "DBNBHR-003", name: "Lenovo • IdeaPad Slim 3", qty: "1 pcs", user: "Karudin", dept: "Human Resources & General Affair", date: "Jun 24, 00:00" },
-                          { tag: "DBNBFAT-007", name: "Lenovo • IdeaPad Slim 3", qty: "1 pcs", user: "Kharisma Ayu", dept: "Finance, Accounting & Tax", date: "Jun 23, 00:00" },
-                          { tag: "DBNBSLS-007", name: "Dell • Vostro 3400", qty: "1 pcs", user: "Ibrahim", dept: "Sales", date: "Jun 18, 00:00" },
-                          { tag: "DBNBSLS-007", name: "Dell • Vostro 3400", qty: "1 pcs", user: "Ibrahim", dept: "Sales", date: "Jun 18, 00:00" },
-                        ].map((row, idx) => (
+                        {checkouts.map((row, idx) => (
                           <tr key={idx} className="hover:bg-muted/30 transition-colors">
                             <td className="py-3">
                               <span className="font-semibold block font-mono text-[10px] text-muted-foreground">{row.tag}</span>
@@ -332,13 +448,7 @@ export default function Page() {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {[
-                          { name: "Canon BP - 790 (MAGENTA)", desc: "Blueprint Indonesia • Ink", qty: "2 pcs", user: "Dzul Khair Aropian", date: "Jul 01, 00:00" },
-                          { name: "Epson BP - 003 (MAGENTA)", desc: "Blueprint Indonesia • Ink", qty: "1 pcs", user: "Dzul Khair Aropian", date: "Jul 01, 00:00" },
-                          { name: "Canon BP - 790 (YELLOW)", desc: "Blueprint Indonesia • Ink", qty: "1 pcs", user: "Dzul Khair Aropian", date: "Jul 01, 00:00" },
-                          { name: "Epson BP - 003 (BK)", desc: "Blueprint Indonesia • Ink", qty: "2 pcs", user: "Monica", date: "Jul 01, 00:00" },
-                          { name: "Epson BP - 003 (CYAN)", desc: "Blueprint Indonesia • Ink", qty: "1 pcs", user: "Dzul Khair Aropian", date: "Jul 01, 00:00" },
-                        ].map((row, idx) => (
+                        {consumableCheckouts.map((row, idx) => (
                           <tr key={idx} className="hover:bg-muted/30 transition-colors">
                             <td className="py-3">
                               <span className="font-medium text-foreground block">{row.name}</span>
@@ -388,13 +498,7 @@ export default function Page() {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {[
-                          { name: "Epson BP - 003 (BK)", desc: "Blueprint Indonesia • Ink", qty: "10 items", status: "In Stock" },
-                          { name: "Canon BP - 790 (MAGENTA)", desc: "Blueprint Indonesia • Ink", qty: "10 items", status: "In Stock" },
-                          { name: "Epson BP - 003 (YELLOW)", desc: "Blueprint Indonesia • Ink", qty: "10 items", status: "In Stock" },
-                          { name: "Canon BP - 790 (YELLOW)", desc: "Blueprint Indonesia • Ink", qty: "10 items", status: "In Stock" },
-                          { name: "Canon BP - 790 (CYAN)", desc: "Blueprint Indonesia • Ink", qty: "10 items", status: "In Stock" },
-                        ].map((row, idx) => (
+                        {consumablesStock.map((row, idx) => (
                           <tr key={idx} className="hover:bg-muted/30 transition-colors">
                             <td className="py-3">
                               <span className="font-medium text-foreground block">{row.name}</span>
@@ -439,34 +543,7 @@ export default function Page() {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {[
-                          { tag: "DBNBMKT-013", name: "Lenovo • ThinkPad L14", qty: "1 pcs", user: "N/A", dept: "Marketing", date: "Jul 01, 15:52" },
-                          { tag: "DBNBPRC-001", name: "Dell • Latitude 3410", qty: "1 pcs", user: "Grace Ega", dept: "Finance, Accounting & Tax", date: "Jul 01, 09:52" },
-                          { tag: "DBNBSLS-016", name: "Dell • Latitude 3410", qty: "1 pcs", user: "N/A", dept: "Sales", date: "Jul 01, 09:44" },
-                          { tag: "DBNBSLS-015", name: "Dell • Latitude 3410", qty: "1 pcs", user: "Meiry", dept: "Sales", date: "Jul 01, 09:23" },
-                          { tag: "DBNBSLS-014", name: "Dell • Vostro 3400", qty: "1 pcs", user: "N/A", dept: "Sales", date: "Jul 01, 09:21" },
-                          { tag: "DBNBSLS-013", name: "Dell • Vostro 3400", qty: "1 pcs", user: "Nadya", dept: "Sales", date: "Jul 01, 09:20" },
-                          { tag: "DBNBSC-007", name: "Lenovo • V14 IIL", qty: "1 pcs", user: "N/A", dept: "Supply Chain & Logistics", date: "Jul 01, 09:05" },
-                          { tag: "DBNBSLS-012", name: "Dell • Vostro 3400", qty: "1 pcs", user: "Doni Eko", dept: "Sales", date: "Jul 01, 08:53" },
-                          { tag: "DBPRMKT-001", name: "Canon • Pixma G 2010", qty: "1 pcs", user: "Monica", dept: "Marketing", date: "Jun 30, 10:20" },
-                          { tag: "DBPRSC-001", name: "Canon • Pixma G 3010", qty: "1 pcs", user: "Ari Kurniadi", dept: "Supply Chain & Logistics", date: "Jun 30, 09:51" },
-                          { tag: "DBPRPRC-003", name: "Canon • Pixma G 3010", qty: "1 pcs", user: "Grace Ega", dept: "Finance, Accounting & Tax", date: "Jun 30, 09:48" },
-                          { tag: "DBNBMKT-007", name: "Dell • Latitude 3410", qty: "1 pcs", user: "Achmad Satrio", dept: "Marketing", date: "Jun 24, 11:10" },
-                          { tag: "DBNBSLS-010", name: "Dell • Latitude 3410", qty: "1 pcs", user: "Iqbal", dept: "Sales", date: "Jun 24, 10:55" },
-                          { tag: "DBNBHR-001", name: "Dell • Latitude 3410", qty: "1 pcs", user: "Khaerunisa Aulia", dept: "Human Resources & General Affair", date: "Jun 23, 15:17" },
-                          { tag: "DBNBSLS-007", name: "Dell • Vostro 3400", qty: "1 pcs", user: "Ibrahim", dept: "Sales", date: "Jun 17, 10:54" },
-                          { tag: "DBNBMKT-004", name: "Dell • Latitude 3410", qty: "1 pcs", user: "Kemala Mustika", dept: "Marketing", date: "Jun 09, 10:13" },
-                          { tag: "DBNBMGT-008", name: "ASUS • Vivobook Pro 14 OLED", qty: "1 pcs", user: "Divani", dept: "Finance, Accounting & Tax", date: "Jun 05, 13:48" },
-                          { tag: "DBNBTS-010", name: "Dell • Vostro 3400", qty: "1 pcs", user: "Farhan Hibatullah", dept: "Sales", date: "Apr 01, 08:50" },
-                          { tag: "DBNBTS-009", name: "Dell • Latitude 3410", qty: "1 pcs", user: "Dhia Al Barra", dept: "Technical Support", date: "Apr 01, 08:44" },
-                          { tag: "DBNBTS-008", name: "Dell • Latitude 3410", qty: "1 pcs", user: "Adrian Girvan", dept: "Sales", date: "Apr 01, 08:02" },
-                          { tag: "DBNBTS-004", name: "Dell • Inspiron 3000", qty: "1 pcs", user: "Putri Rahma Yulia", dept: "Technical Support", date: "Jan 26, 01:53" },
-                          { tag: "DBNBSLS-001", name: "Dell • Inspiron 3000", qty: "1 pcs", user: "Dhea Utami Putri", dept: "Sales", date: "Jan 13, 08:03" },
-                          { tag: "DBNBTS-003", name: "Dell • Vostro 3400", qty: "1 pcs", user: "Bagus Paramajati", dept: "Technical Support", date: "Jan 07, 08:39" },
-                          { tag: "DBNBSC-005", name: "Dell • Inspiron 3000", qty: "1 pcs", user: "Dian Indriani", dept: "Supply Chain & Logistics", date: "Dec 22, 01:49" },
-                          { tag: "DBNBSC-004", name: "Dell • Vostro 3400", qty: "1 pcs", user: "Irpan Sanjaya", dept: "Supply Chain & Logistics", date: "Dec 09, 09:51" },
-                          { tag: "DBNBSC-003", name: "Lenovo • V14 IIL", qty: "1 pcs", user: "Ahmad Jamil", dept: "Supply Chain & Logistics", date: "Dec 09, 09:36" },
-                        ].map((row, idx) => (
+                        {oldAssets.map((row, idx) => (
                           <tr key={idx} className="hover:bg-muted/30 transition-colors">
                             <td className="py-2.5">
                               <span className="font-semibold block font-mono text-[10px] text-muted-foreground">{row.tag}</span>

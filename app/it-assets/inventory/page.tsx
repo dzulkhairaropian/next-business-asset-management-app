@@ -18,7 +18,20 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { DownloadIcon, PlusIcon } from "lucide-react"
+import {
+  ActivityIcon,
+  AlertTriangleIcon,
+  ArrowUpRightIcon,
+  BoxesIcon,
+  CircleDollarSignIcon,
+  DownloadIcon,
+  FilterIcon,
+  LaptopIcon,
+  MoreHorizontalIcon,
+  PlusIcon,
+  SearchIcon,
+  WrenchIcon,
+} from "lucide-react"
 
 import { columns, Asset } from "./columns"
 import { DataTable } from "./data-table"
@@ -78,6 +91,13 @@ const assets: Asset[] = [
 ]
 
 export default function AssetManagementPage() {
+  const totalAssets = assets.length
+  const readyToDeploy = assets.filter((a) => a.status === "Ready to Deploy").length
+  const deployed = assets.filter((a) => a.status === "Deployed").length
+  const broken = assets.filter(
+    (a) => a.status === "Service" || a.status === "Broken / Defective"
+  ).length
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -119,6 +139,64 @@ export default function AssetManagementPage() {
           <div className="flex flex-col gap-1.5">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Asset Management</h1>
             <p className="text-sm text-muted-foreground">Manage and track IT devices across organization locations.</p>
+          </div>
+
+          {/* Quick Stats Grid */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border bg-card p-5 text-card-foreground shadow-xs">
+              <div className="flex items-center justify-between pb-2">
+                <span className="text-sm font-medium text-muted-foreground">Total Assets</span>
+                <div className="h-8 w-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <BoxesIcon className="h-4.5 w-4.5" />
+                </div>
+              </div>
+              <div className="text-3xl font-extrabold tracking-tight mt-1">{totalAssets}</div>
+              <p className="text-xs text-muted-foreground mt-2">
+                <span className="text-emerald-500 font-semibold inline-flex items-center gap-0.5">
+                  <ArrowUpRightIcon className="h-3 w-3" /> +0%
+                </span>{" "}
+                from last month
+              </p>
+            </div>
+
+            <div className="rounded-xl border bg-card p-5 text-card-foreground shadow-xs">
+              <div className="flex items-center justify-between pb-2">
+                <span className="text-sm font-medium text-muted-foreground">Ready to Deploy</span>
+                <div className="h-8 w-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                  <WrenchIcon className="h-4.5 w-4.5" />
+                </div>
+              </div>
+              <div className="text-3xl font-extrabold tracking-tight mt-1">{readyToDeploy}</div>
+              <p className="text-xs text-muted-foreground mt-2">
+                <span className="text-blue-500 font-semibold">Available</span> in inventory
+              </p>
+            </div>
+
+            <div className="rounded-xl border bg-card p-5 text-card-foreground shadow-xs">
+              <div className="flex items-center justify-between pb-2">
+                <span className="text-sm font-medium text-muted-foreground">Deployed</span>
+                <div className="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                  <ActivityIcon className="h-4.5 w-4.5" />
+                </div>
+              </div>
+              <div className="text-3xl font-extrabold tracking-tight mt-1">{deployed}</div>
+              <p className="text-xs text-muted-foreground mt-2">
+                <span className="text-emerald-500 font-semibold">Assigned</span> to employees
+              </p>
+            </div>
+
+            <div className="rounded-xl border bg-card p-5 text-card-foreground shadow-xs">
+              <div className="flex items-center justify-between pb-2">
+                <span className="text-sm font-medium text-muted-foreground">In Service</span>
+                <div className="h-8 w-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                  <AlertTriangleIcon className="h-4.5 w-4.5" />
+                </div>
+              </div>
+              <div className="text-3xl font-extrabold tracking-tight mt-1">{broken}</div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Assets currently in repair
+              </p>
+            </div>
           </div>
 
           <DataTable columns={columns} data={assets} />
